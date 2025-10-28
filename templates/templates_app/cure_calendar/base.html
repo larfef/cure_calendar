@@ -1,0 +1,767 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title }}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;500;600;700&display=swap"
+              rel="stylesheet">
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'templates_app/css/cure_calendar/common.css' %}">
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'templates_app/css/cure_calendar/header.css' %}">
+        <style>
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                width: 210mm;
+                /* A4 width */
+                height: 297mm;
+                /* A4 height */
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                word-wrap: break-word;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="width: 595px;
+                    height: 842px;
+                    padding: 16px;
+                    background: white;
+                    overflow: hidden;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    align-items: flex-start;
+                    gap: 16px;
+                    display: inline-flex">
+            {% include "templates_app/cure_calendar/header.html" %}
+            <div style="align-self: stretch;
+                        flex-direction: column;
+                        justify-content: flex-start;
+                        align-items: flex-start;
+                        gap: 32px;
+                        display: flex">
+                <div style="align-self: stretch;
+                            flex-direction: column;
+                            justify-content: flex-start;
+                            align-items: flex-start;
+                            gap: 12px;
+                            display: flex">
+                    <div style="align-self: stretch;
+                                flex-direction: column;
+                                justify-content: flex-start;
+                                align-items: flex-start;
+                                gap: 6px;
+                                display: flex">
+                        <div style="align-self: stretch;
+                                    justify-content: center;
+                                    display: flex;
+                                    flex-direction: column;
+                                    color: #1C211C;
+                                    font-size: 11px;
+                                    font-family: Rethink Sans;
+                                    font-weight: 500;
+                                    line-height: 11px;
+                                    word-wrap: break-word">Phase 1  (Jour 1 ⭢ Jour  14)</div>
+                        <div style="align-self: stretch;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    display: inline-flex">
+                            <div style="align-self: stretch;
+                                        justify-content: flex-start;
+                                        align-items: center;
+                                        gap: 8px;
+                                        display: flex">
+                                <div style="color: #3A423A;
+                                            font-size: 8px;
+                                            font-family: Rethink Sans;
+                                            font-weight: 400;
+                                            line-height: 16px;
+                                            word-wrap: break-word">Cochez chaque semaine terminée</div>
+                                <div style="justify-content: flex-start;
+                                            align-items: center;
+                                            gap: 6px;
+                                            display: flex">
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                </div>
+                            </div>
+                            <div style="padding-left: 12px;
+                                        padding-right: 12px;
+                                        padding-top: 4px;
+                                        padding-bottom: 4px;
+                                        background: #FAFAFA;
+                                        border-top-left-radius: 5px;
+                                        border-top-right-radius: 2px;
+                                        outline: 0.50px #B5BFB5 solid;
+                                        outline-offset: -0.25px;
+                                        justify-content: center;
+                                        align-items: center;
+                                        display: flex">
+                                <div style="color: #2A322A;
+                                            font-size: 8px;
+                                            font-family: Rethink Sans;
+                                            font-weight: 400;
+                                            line-height: 16px;
+                                            word-wrap: break-word">
+                                    Date début de la cure : ...................................
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% include "templates_app/cure_calendar/table.html" %}
+                </div>
+                <div style="align-self: stretch;
+                            flex-direction: column;
+                            justify-content: flex-start;
+                            align-items: flex-start;
+                            gap: 12px;
+                            display: flex">
+                    <div style="align-self: stretch;
+                                flex-direction: column;
+                                justify-content: flex-start;
+                                align-items: flex-start;
+                                gap: 6px;
+                                display: flex">
+                        <div style="align-self: stretch;
+                                    justify-content: center;
+                                    display: flex;
+                                    flex-direction: column;
+                                    color: #1C211C;
+                                    font-size: 11px;
+                                    font-family: Rethink Sans;
+                                    font-weight: 500;
+                                    line-height: 11px;
+                                    word-wrap: break-word">Phase 2  (Jour 15 ⭢ Jour  29)</div>
+                        <div style="align-self: stretch;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    display: inline-flex">
+                            <div style="align-self: stretch;
+                                        justify-content: flex-start;
+                                        align-items: center;
+                                        gap: 8px;
+                                        display: flex">
+                                <div style="color: #3A423A;
+                                            font-size: 8px;
+                                            font-family: Rethink Sans;
+                                            font-weight: 400;
+                                            line-height: 16px;
+                                            word-wrap: break-word">Cochez chaque semaine terminée</div>
+                                <div style="justify-content: flex-start;
+                                            align-items: center;
+                                            gap: 6px;
+                                            display: flex">
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                </div>
+                            </div>
+                            <div style="padding-left: 12px;
+                                        padding-right: 12px;
+                                        padding-top: 4px;
+                                        padding-bottom: 4px;
+                                        background: #FAFAFA;
+                                        border-top-left-radius: 2px;
+                                        border-top-right-radius: 2px;
+                                        outline: 0.50px #B5BFB5 solid;
+                                        outline-offset: -0.25px;
+                                        justify-content: center;
+                                        align-items: center;
+                                        display: flex">
+                                <div style="color: #2A322A;
+                                            font-size: 8px;
+                                            font-family: Rethink Sans;
+                                            font-weight: 400;
+                                            line-height: 16px;
+                                            word-wrap: break-word">
+                                    Date début de la cure : ...................................
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="align-self: stretch;
+                                outline: 0.50px #909B90 solid;
+                                outline-offset: -0.25px;
+                                justify-content: flex-start;
+                                align-items: flex-start;
+                                display: inline-flex">
+                        <div style="flex: 1 1 0;
+                                    height: 30px;
+                                    align-self: stretch;
+                                    padding-left: 6px;
+                                    padding-right: 6px;
+                                    padding-top: 4px;
+                                    padding-bottom: 4px;
+                                    background: #F1F8F1;
+                                    justify-content: flex-start;
+                                    align-items: center;
+                                    gap: 6px;
+                                    display: flex">
+                            <img src="/static/templates_app/images/continue.svg"
+                                 alt="Gélules"
+                                 width="12"
+                                 height="12">
+                            <div style="color: black;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 600;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Continuer :</div>
+                            <div style="flex: 1 1 0">
+                                <span style="color: #2A322A;
+                                             font-size: 8px;
+                                             font-family: Rethink Sans;
+                                             font-weight: 400;
+                                             line-height: 11px;
+                                             word-wrap: break-word">Oméga 3</span><span style="color: #909B90;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word">|</span><span style="color: #2A322A;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word">Labotix MB</span><span style="color: #909B90;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word">|</span><span style="color: #B5BFB5;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word"></span><span style="color: #2A322A;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word">Resvératrol</span>
+                            </div>
+                        </div>
+                        <div style="flex: 1 1 0;
+                                    height: 30px;
+                                    align-self: stretch;
+                                    padding-left: 6px;
+                                    padding-right: 6px;
+                                    padding-top: 4px;
+                                    padding-bottom: 4px;
+                                    background: #FDEAEA;
+                                    justify-content: flex-start;
+                                    align-items: center;
+                                    gap: 6px;
+                                    display: flex">
+                            <img src="/static/templates_app/images/stop.svg"
+                                 alt="Gélules"
+                                 width="12"
+                                 height="12">
+                            <div style="color: black;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 600;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Arrêter :</div>
+                            <div style="flex: 1 1 0;
+                                        color: #2A322A;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 400;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Mucopure (Arrêt au Jour 21)</div>
+                        </div>
+                        <div style="flex: 1 1 0;
+                                    height: 30px;
+                                    align-self: stretch;
+                                    padding-left: 6px;
+                                    padding-right: 6px;
+                                    padding-top: 4px;
+                                    padding-bottom: 4px;
+                                    background: #E7F0FA;
+                                    justify-content: flex-start;
+                                    align-items: center;
+                                    gap: 6px;
+                                    display: flex">
+                            <img src="/static/templates_app/images/add.svg"
+                                 alt="Gélules"
+                                 width="12"
+                                 height="12">
+                            <div style="color: black;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 600;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Ajouter</div>
+                            <div style="flex: 1 1 0;
+                                        color: #2A322A;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 400;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Citrobiotic</div>
+                        </div>
+                    </div>
+                    <table style="width: 100%;
+                                  border-collapse: collapse;
+                                  font-family: Rethink Sans, sans-serif">
+                        <!-- Table Header -->
+                        <thead>
+                            <tr style="background: #DBEEDD;">
+                                <th style="padding: 8px 12px;
+                                           text-align: center;
+                                           color: #1E2D1E;
+                                           font-size: 10px;
+                                           font-weight: 500;
+                                           line-height: 22px;
+                                           border: 0.50px solid #B5BFB5">Produit</th>
+                                <th style="padding: 8px 12px;
+                                           text-align: center;
+                                           color: #1E2D1E;
+                                           font-size: 10px;
+                                           font-weight: 500;
+                                           line-height: 22px;
+                                           border: 0.50px solid #B5BFB5">Moment</th>
+                                <th style="padding: 8px 12px;
+                                           text-align: center;
+                                           color: #1E2D1E;
+                                           font-size: 10px;
+                                           font-weight: 500;
+                                           line-height: 22px;
+                                           border: 0.50px solid #B5BFB5">Dosage</th>
+                                <th style="padding: 8px 12px;
+                                           text-align: center;
+                                           color: #1E2D1E;
+                                           font-size: 10px;
+                                           font-weight: 500;
+                                           line-height: 22px;
+                                           border: 0.50px solid #B5BFB5">Durée</th>
+                            </tr>
+                        </thead>
+                        <!-- Table Body -->
+                        <tbody>
+                            <!-- Row: Citrobiotic -->
+                            <tr style="background: white;">
+                                <td style="padding: 8px;
+                                           color: #1E2D1E;
+                                           font-size: 11px;
+                                           font-weight: 400;
+                                           line-height: 14px;
+                                           border: 0.50px solid #B5BFB5">Citrobiotic</td>
+                                <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <img src="/static/templates_app/images/matin.svg"
+                                             alt="Matin"
+                                             width="17"
+                                             height="17">
+                                        <span style="color: #3A423A;
+                                                     font-size: 11px;
+                                                     font-weight: 400;
+                                                     line-height: 14px">Matin</span>
+                                        <span style="color: #3A423A;
+                                                     font-size: 11px;
+                                                     font-weight: 400;
+                                                     line-height: 24px">+</span>
+                                        <img src="/static/templates_app/images/soir.svg"
+                                             alt="Soir"
+                                             width="12"
+                                             height="12">
+                                        <span style="color: #3A423A;
+                                                     font-size: 11px;
+                                                     font-weight: 400;
+                                                     line-height: 14px">Soir</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <img src="/static/templates_app/images/gouttes.svg"
+                                             alt="Gouttes"
+                                             width="18"
+                                             height="17">
+                                        <div>
+                                            <div style="color: #3A423A;
+                                                        font-size: 11px;
+                                                        font-weight: 400;
+                                                        line-height: 14px">15 gouttes</div>
+                                            <div style="color: #6B766B;
+                                                        font-size: 6px;
+                                                        font-weight: 400;
+                                                        line-height: 6px">dans de l'eau matin + soir</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                                    <div style="color: #1E2D1E;
+                                                font-size: 11px;
+                                                font-weight: 400;
+                                                line-height: 14px">14 jours</div>
+                                    <div style="color: #8D2511;
+                                                font-size: 6px;
+                                                font-weight: 400;
+                                                line-height: 6px">Arrêt au jour 29</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="align-self: stretch;
+                            flex-direction: column;
+                            justify-content: flex-start;
+                            align-items: flex-start;
+                            gap: 12px;
+                            display: flex">
+                    <div style="align-self: stretch;
+                                flex-direction: column;
+                                justify-content: flex-start;
+                                align-items: flex-start;
+                                gap: 6px;
+                                display: flex">
+                        <div style="align-self: stretch;
+                                    justify-content: center;
+                                    display: flex;
+                                    flex-direction: column;
+                                    color: #1C211C;
+                                    font-size: 11px;
+                                    font-family: Rethink Sans;
+                                    font-weight: 500;
+                                    line-height: 11px;
+                                    word-wrap: break-word">Phase 3  (Jour 30 ⭢ Jour  X)</div>
+                        <div style="align-self: stretch;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    display: inline-flex">
+                            <div style="align-self: stretch;
+                                        justify-content: flex-start;
+                                        align-items: center;
+                                        gap: 8px;
+                                        display: flex">
+                                <div style="color: #3A423A;
+                                            font-size: 8px;
+                                            font-family: Rethink Sans;
+                                            font-weight: 400;
+                                            line-height: 16px;
+                                            word-wrap: break-word">Cochez chaque semaine terminée</div>
+                                <div style="justify-content: flex-start;
+                                            align-items: center;
+                                            gap: 6px;
+                                            display: flex">
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                    <div style="width: 14px;
+                                                height: 14px;
+                                                background: #FAFAFA;
+                                                border: 0.50px #B5BFB5 solid"></div>
+                                </div>
+                            </div>
+                            <div style="padding-left: 12px;
+                                        padding-right: 12px;
+                                        padding-top: 4px;
+                                        padding-bottom: 4px;
+                                        background: #FAFAFA;
+                                        border-top-left-radius: 2px;
+                                        border-top-right-radius: 2px;
+                                        outline: 0.50px #B5BFB5 solid;
+                                        outline-offset: -0.25px;
+                                        justify-content: center;
+                                        align-items: center;
+                                        display: flex">
+                                <div style="color: #2A322A;
+                                            font-size: 8px;
+                                            font-family: Rethink Sans;
+                                            font-weight: 400;
+                                            line-height: 16px;
+                                            word-wrap: break-word">
+                                    Date début de la cure : ...................................
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="align-self: stretch;
+                                outline: 0.50px #909B90 solid;
+                                outline-offset: -0.25px;
+                                justify-content: flex-start;
+                                align-items: flex-start;
+                                display: inline-flex">
+                        <div style="flex: 1 1 0;
+                                    align-self: stretch;
+                                    padding-left: 6px;
+                                    padding-right: 6px;
+                                    padding-top: 4px;
+                                    padding-bottom: 4px;
+                                    background: #F1F8F1;
+                                    justify-content: flex-start;
+                                    align-items: center;
+                                    gap: 6px;
+                                    display: flex">
+                            <img src="/static/templates_app/images/continue.svg"
+                                 alt="Gélules"
+                                 width="12"
+                                 height="12">
+                            <div style="color: black;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 600;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Continuer :</div>
+                            <div style="flex: 1 1 0">
+                                <span style="color: #2A322A;
+                                             font-size: 8px;
+                                             font-family: Rethink Sans;
+                                             font-weight: 400;
+                                             line-height: 11px;
+                                             word-wrap: break-word">Oméga 3</span><span style="color: #909B90;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word">|</span><span style="color: #2A322A;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word">Labotix MB</span><span style="color: #909B90;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word">|</span><span style="color: #B5BFB5;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word"></span><span style="color: #2A322A;
+             font-size: 8px;
+             font-family: Rethink Sans;
+             font-weight: 400;
+             line-height: 11px;
+             word-wrap: break-word">Resvératrol</span>
+                            </div>
+                        </div>
+                        <div style="flex: 1 1 0;
+                                    align-self: stretch;
+                                    padding-left: 6px;
+                                    padding-right: 6px;
+                                    padding-top: 4px;
+                                    padding-bottom: 4px;
+                                    background: #FDEAEA;
+                                    justify-content: flex-start;
+                                    align-items: center;
+                                    gap: 6px;
+                                    display: flex">
+                            <img src="/static/templates_app/images/stop.svg"
+                                 alt="Gélules"
+                                 width="12"
+                                 height="12">
+                            <div style="color: black;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 600;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Arrêter :</div>
+                            <div style="flex: 1 1 0;
+                                        color: #2A322A;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 400;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Mucopure (Arrêt au Jour 21)</div>
+                        </div>
+                        <div style="flex: 1 1 0;
+                                    align-self: stretch;
+                                    padding-left: 6px;
+                                    padding-right: 6px;
+                                    padding-top: 4px;
+                                    padding-bottom: 4px;
+                                    background: #E7F0FA;
+                                    justify-content: flex-start;
+                                    align-items: center;
+                                    gap: 6px;
+                                    display: flex">
+                            <img src="/static/templates_app/images/add.svg"
+                                 alt="Gélules"
+                                 width="12"
+                                 height="12">
+                            <div style="color: black;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 600;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Ajouter</div>
+                            <div style="flex: 1 1 0;
+                                        color: #2A322A;
+                                        font-size: 8px;
+                                        font-family: Rethink Sans;
+                                        font-weight: 400;
+                                        line-height: 11px;
+                                        word-wrap: break-word">Citrobiotic</div>
+                        </div>
+                    </div>
+                    <table style="width: 100%;
+                                  border-collapse: collapse;
+                                  font-family: Rethink Sans, sans-serif">
+                        <!-- Table Header -->
+                        <thead>
+                            <tr style="background: #DBEEDD;">
+                                <th style="padding: 8px 12px;
+                                           text-align: center;
+                                           color: #1E2D1E;
+                                           font-size: 10px;
+                                           font-weight: 500;
+                                           line-height: 22px;
+                                           border: 0.50px solid #B5BFB5">Produit</th>
+                                <th style="padding: 8px 12px;
+                                           text-align: center;
+                                           color: #1E2D1E;
+                                           font-size: 10px;
+                                           font-weight: 500;
+                                           line-height: 22px;
+                                           border: 0.50px solid #B5BFB5">Moment</th>
+                                <th style="padding: 8px 12px;
+                                           text-align: center;
+                                           color: #1E2D1E;
+                                           font-size: 10px;
+                                           font-weight: 500;
+                                           line-height: 22px;
+                                           border: 0.50px solid #B5BFB5">Dosage</th>
+                                <th style="padding: 8px 12px;
+                                           text-align: center;
+                                           color: #1E2D1E;
+                                           font-size: 10px;
+                                           font-weight: 500;
+                                           line-height: 22px;
+                                           border: 0.50px solid #B5BFB5">Durée</th>
+                            </tr>
+                        </thead>
+                        <!-- Table Body -->
+                        <tbody>
+                            <!-- Row: Labotix Multifibre -->
+                            <tr style="background: white;">
+                                <td style="padding: 8px;
+                                           color: #1E2D1E;
+                                           font-size: 11px;
+                                           font-weight: 400;
+                                           line-height: 14px;
+                                           border: 0.50px solid #B5BFB5">Labotix Multifibre</td>
+                                <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <img src="/static/templates_app/images/matin.svg"
+                                             alt="Matin"
+                                             width="17"
+                                             height="17">
+                                        <span style="color: #3A423A;
+                                                     font-size: 11px;
+                                                     font-weight: 400;
+                                                     line-height: 14px">Matin</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <img src="/static/templates_app/images/dosettes.svg"
+                                             alt="Dosette"
+                                             width="17"
+                                             height="17">
+                                        <div>
+                                            <div style="color: #3A423A;
+                                                        font-size: 11px;
+                                                        font-weight: 400;
+                                                        line-height: 14px">1 dosette</div>
+                                            <div style="color: #6B766B;
+                                                        font-size: 6px;
+                                                        font-weight: 400;
+                                                        line-height: 6px">1/2 les 15 premiers jours</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding: 8px;
+                                           color: #1E2D1E;
+                                           font-size: 11px;
+                                           font-weight: 400;
+                                           line-height: 14px;
+                                           border: 0.50px solid #B5BFB5">2 mois</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="align-self: stretch;
+                        flex: 1 1 0;
+                        padding: 8px;
+                        outline: 0.50px #B5BFB5 solid;
+                        outline-offset: -0.25px;
+                        justify-content: flex-start;
+                        align-items: flex-start;
+                        gap: 8px;
+                        display: inline-flex">
+                <div style="width: 499px;
+                            height: 8px;
+                            color: #3A423A;
+                            font-size: 8px;
+                            font-family: Rethink Sans;
+                            font-weight: 400;
+                            line-height: 8px;
+                            word-wrap: break-word">Notez vos ressentis :</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

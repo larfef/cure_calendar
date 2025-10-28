@@ -1,0 +1,199 @@
+{% load static %}
+<table style="width: 100%; border-collapse: collapse; ">
+    <!-- Table Header -->
+    <thead>
+        <tr style="background: var(--primary-green-100);">
+            <th style="padding: 8px 12px;
+                       text-align: center;
+                       color: var(--secondary-900);
+                       font-size: var(--font-s);
+                       font-weight: 500;
+                       line-height: var(--line-m);
+                       border: 0.50px solid var(--neutral-gray-400)">{{ text.table.header.1 }}</th>
+            <th style="padding: 8px 12px;
+                       text-align: center;
+                       color: var(--secondary-900);
+                       font-size: var(--font-s);
+                       font-weight: 500;
+                       line-height: var(--line-m);
+                       border: 0.50px solid var(--neutral-gray-400)">{{ text.table.header.2 }}</th>
+            <th style="padding: 8px 12px;
+                       text-align: center;
+                       color: var(--secondary-900);
+                       font-size: var(--font-s);
+                       font-weight: 500;
+                       line-height: var(--line-m);
+                       border: 0.50px solid var(--neutral-gray-400)">{{ text.table.header.3 }}</th>
+            <th style="padding: 8px 12px;
+                       text-align: center;
+                       color: var(--secondary-900);
+                       font-size: var(--font-s);
+                       font-weight: 500;
+                       line-height: var(--line-m);
+                       border: 0.50px solid var(--neutral-gray-400)">{{ text.table.header.4 }}</th>
+        </tr>
+    </thead>
+    <!-- Table Body -->
+    <tbody>
+        <!-- Row 1: Labotix MB -->
+        <tr style="background: white;">
+            <td style="padding: 8px;
+                       color: #1E2D1E;
+                       font-size: 11px;
+                       font-weight: 400;
+                       line-height: 14px;
+                       border: 0.50px solid #B5BFB5">Labotix MB</td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="{% static 'templates_app/images/matin-a-jeun.svg' %}"
+                         alt="Matin à jeun"
+                         width="17"
+                         height="17">
+                    <span style="color: #3A423A;
+                                 font-size: 11px;
+                                 font-weight: 400;
+                                 line-height: 14px">Matin à jeun</span>
+                </div>
+            </td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="{% static 'templates_app/images/gellule.svg' %}"
+                         alt="Gélule"
+                         width="17"
+                         height="17">
+                    <span style="color: #3A423A;
+                                 font-size: 11px;
+                                 font-weight: 400;
+                                 line-height: 14px">1 gélule</span>
+                </div>
+            </td>
+            <td style="padding: 8px;
+                       color: #1E2D1E;
+                       font-size: 11px;
+                       font-weight: 400;
+                       line-height: 14px;
+                       border: 0.50px solid #B5BFB5">2 mois</td>
+        </tr>
+        <!-- Row 2: Resvératrol -->
+        <tr style="background: white;">
+            <td style="padding: 8px;
+                       color: #1E2D1E;
+                       font-size: 11px;
+                       font-weight: 400;
+                       line-height: 14px;
+                       border: 0.50px solid #B5BFB5">Resvératrol</td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="{% static 'templates_app/images/matin.svg' %}"
+                         alt="Matin"
+                         width="17"
+                         height="17">
+                    <span style="color: #3A423A;
+                                 font-size: 11px;
+                                 font-weight: 400;
+                                 line-height: 14px">Matin</span>
+                </div>
+            </td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="{% static 'templates_app/images/gellule.svg' %}"
+                         alt="Gélule"
+                         width="17"
+                         height="17">
+                    <span style="color: #3A423A;
+                                 font-size: 11px;
+                                 font-weight: 400;
+                                 line-height: 14px">1 gélule</span>
+                </div>
+            </td>
+            <td style="padding: 8px;
+                       color: #1E2D1E;
+                       font-size: 11px;
+                       font-weight: 400;
+                       line-height: 14px;
+                       border: 0.50px solid #B5BFB5">2 mois</td>
+        </tr>
+        <!-- Row 3: Mucopure 250 -->
+        <tr style="background: white;">
+            <td style="padding: 8px;
+                       color: #1E2D1E;
+                       font-size: 11px;
+                       font-weight: 400;
+                       line-height: 14px;
+                       border: 0.50px solid #B5BFB5">Mucopure 250</td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="{% static 'templates_app/images/matin.svg' %}"
+                         alt="Matin"
+                         width="17"
+                         height="17">
+                    <span style="color: #3A423A;
+                                 font-size: 11px;
+                                 font-weight: 400;
+                                 line-height: 14px">Matin</span>
+                </div>
+            </td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="{% static 'templates_app/images/dosettes.svg' %}"
+                         alt="Dosette"
+                         width="17"
+                         height="17">
+                    <span style="color: #3A423A;
+                                 font-size: 11px;
+                                 font-weight: 400;
+                                 line-height: 14px">1 dosette</span>
+                </div>
+            </td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="color: #1E2D1E;
+                            font-size: 11px;
+                            font-weight: 400;
+                            line-height: 14px">21 jours</div>
+                <div style="color: #8D2511;
+                            font-size: 6px;
+                            font-weight: 400;
+                            line-height: 6px">Arrêt au jour 21</div>
+            </td>
+        </tr>
+        <!-- Row 4: Oméga 3 Epax -->
+        <tr style="background: white;">
+            <td style="padding: 8px;
+                       color: #1E2D1E;
+                       font-size: 11px;
+                       font-weight: 400;
+                       line-height: 14px;
+                       border: 0.50px solid #B5BFB5">Oméga 3 Epax</td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="{% static 'templates_app/images/soir.svg' %}"
+                         alt="Soir"
+                         width="12"
+                         height="12">
+                    <span style="color: #3A423A;
+                                 font-size: 11px;
+                                 font-weight: 400;
+                                 line-height: 14px">Soir</span>
+                </div>
+            </td>
+            <td style="padding: 8px; border: 0.50px solid #B5BFB5;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="{% static 'templates_app/images/gellules.svg' %}"
+                         alt="Gélules"
+                         width="17"
+                         height="17">
+                    <span style="color: #3A423A;
+                                 font-size: 11px;
+                                 font-weight: 400;
+                                 line-height: 14px">2 gélules</span>
+                </div>
+            </td>
+            <td style="padding: 8px;
+                       color: #1E2D1E;
+                       font-size: 11px;
+                       font-weight: 400;
+                       line-height: 14px;
+                       border: 0.50px solid #B5BFB5">2 mois</td>
+        </tr>
+    </tbody>
+</table>

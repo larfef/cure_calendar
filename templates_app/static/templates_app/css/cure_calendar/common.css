@@ -1,0 +1,13 @@
+:root {
+    --primary-green-100: #DBEEDD;
+    --primary-green-500: #70AD71;
+    --secondary-900: #1E2D1E;
+    --text-white: #FAFAFA;
+    --background-color: #FEF1F1;
+    --neutral-gray-600: #6B766B;
+    --neutral-gray-400: #B5BFB5;
+    --font-xs: 9px;
+    --line-xs: 9px;
+    --line-m: 22px;
+    --font-s: 12px;
+}

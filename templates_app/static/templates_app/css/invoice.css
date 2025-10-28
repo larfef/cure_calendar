@@ -1,0 +1,40 @@
+
+body {
+    font-family: 'Rethink Sans';
+
+}
+
+.a4-container {
+    padding: 20px;
+    border: none !important;
+}
+
+
+.invoice_header {
+    height: 300px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+}
+
+.symp_infos_wrapper img {
+    width: auto;
+    height: 100px;
+}
+
+.symp_infos {
+    margin-top: 12px;
+}
+
+.invoice_infos {
+    margin-top: 24px;
+}
+
+.client_infos_wrapper {
+    margin-top: 100px;
+}
+
+.invoice_content {
+    margin-top: 12px;
+}
