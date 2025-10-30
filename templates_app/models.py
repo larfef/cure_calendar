@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator
 from tinymce.models import HTMLField
 
 
-class UnitType(models.TextChoices):
+class IntakeUnit(models.TextChoices):
     """Unit types for dosage"""
 
     CAPSULE = "CAPSULE", "Gélule(s)"
@@ -41,7 +41,7 @@ class IntakeCondition(models.TextChoices):
     NO_CONDITION = "NO_CONDITION", "Aucune condition"
 
 
-class DurationType(models.TextChoices):
+class DurationUnit(models.TextChoices):
     """Duration unit types"""
 
     DAYS = "DAYS", "Jour(s)"
@@ -55,17 +55,6 @@ class Product(models.Model):
 
     label = HTMLField(default=None, blank=True, null=True, verbose_name="Label")
 
-    # Keep legacy field for backward compatibility during migration
-    posology_legacy = HTMLField(
-        default=None,
-        blank=True,
-        null=True,
-        verbose_name="Posologie (ancienne)",
-        db_column="posology",
-    )
-
-    duration = HTMLField(default=None, blank=True, null=True, verbose_name="Durée")
-    price = models.FloatField(default=0, verbose_name="Prix")
     phase = models.IntegerField(
         default=1, verbose_name="Phase (cortisol=1, microbiote=2)"
     )
@@ -83,41 +72,39 @@ class Product(models.Model):
 
     def get_posology_display(self):
         """Generate human-readable posology from structured data"""
-        if self.use_structured_posology and self.posology_schedules.exists():
+        if self.use_structured_posology and self.posology_schemes.exists():
             return self._format_structured_posology()
         return self.posology_legacy
 
     def _format_structured_posology(self):
-        """Format structured posology as HTML"""
-        schedules = self.posology_schedules.all().order_by("order")
+        """Format structured posology as list"""
+        schemes = self.posology_schemes.all().order_by("order")
         lines = []
-        for schedule in schedules:
-            intakes = schedule.intakes.all().order_by("time_of_day")
+        for scheme in schemes:
+            intakes = scheme.intakes.all().order_by("time_of_day")
             for intake in intakes:
-                line = f"{intake.quantity} {intake.get_unit_display()}"
+                line = f"{intake.quantity} {intake.get_intake_unit()}"
                 if intake.time_of_day != "ANYTIME":
-                    line += f" {intake.get_time_of_day_display()}"
+                    line += f" {intake.get_time_of_day()}"
                 if intake.intake_condition != "NO_CONDITION":
-                    line += f" ({intake.get_intake_condition_display()})"
-                if intake.specific_time:
-                    line += f" à {intake.specific_time}"
+                    line += f" ({intake.get_intake_condition()})"
                 lines.append(line)
-        return "<p>" + "<br>".join(lines) + "</p>"
+        return "".join(lines)
 
     class Meta:
         verbose_name_plural = "Produits"
 
 
-class PosologySchedule(models.Model):
+class PosologyScheme(models.Model):
     """
-    A posology schedule defines a complete intake pattern for a product.
-    A product can have multiple schedules (e.g., different phases of treatment).
+    A posology scheme defines a complete intake pattern for a product.
+    A product can have multiple schemes (e.g., different phases of treatment).
     """
 
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name="posology_schedules",
+        related_name="posology_schemes",
         verbose_name="Produit",
     )
 
@@ -139,10 +126,10 @@ class PosologySchedule(models.Model):
         blank=True, null=True, verbose_name="Durée", validators=[MinValueValidator(1)]
     )
 
-    duration_type = models.CharField(
+    duration_unit = models.CharField(
         max_length=20,
-        choices=DurationType.choices,
-        default=DurationType.DAYS,
+        choices=DurationUnit.choices,
+        default=DurationUnit.DAYS,
         verbose_name="Unité de durée",
     )
 
@@ -171,6 +158,18 @@ class PosologySchedule(models.Model):
         """Calculate total daily quantity"""
         return sum(intake.quantity * intake.frequency for intake in self.intakes.all())
 
+    def get_formatted_scheme_duration(self):
+        return f"{self.duration_value} {DurationUnit(self.duration_unit).label}"
+
+    def get_formatted_intake_quantity_unit(self):
+        """
+        Returns a list of formatted strings, one for each intake item's quantity and unit.
+        """
+        return [
+            f"{intake.quantity} {intake.get_intake_unit()}"
+            for intake in self.intakes.all()
+        ]
+
 
 class PosologyIntake(models.Model):
     """
@@ -179,7 +178,7 @@ class PosologyIntake(models.Model):
     """
 
     schedule = models.ForeignKey(
-        PosologySchedule,
+        PosologyScheme,
         on_delete=models.CASCADE,
         related_name="intakes",
         verbose_name="Schéma posologique",
@@ -194,20 +193,16 @@ class PosologyIntake(models.Model):
         help_text="Ex: 1, 2, 0.5, 10",
     )
 
-    unit = models.CharField(
+    intake_unit = models.CharField(
         max_length=20,
-        choices=UnitType.choices,
-        default=UnitType.CAPSULE,
+        choices=IntakeUnit.choices,
+        default=IntakeUnit.CAPSULE,
         verbose_name="Unité",
     )
 
     # Timing
     time_of_day = models.CharField(
         max_length=20, choices=TimeOfDay.choices, verbose_name="Moment de la journée"
-    )
-
-    specific_time = models.TimeField(
-        blank=True, null=True, verbose_name="Heure spécifique", help_text="Ex: 16:00"
     )
 
     # Conditions
@@ -238,12 +233,21 @@ class PosologyIntake(models.Model):
         ordering = ["schedule", "time_of_day", "order"]
 
     def __str__(self):
-        text = f"{self.quantity} {self.get_unit_display()}"
+        text = f"{self.quantity} {self.intake_unit}"
         if self.time_of_day != "ANYTIME":
-            text += f" - {self.get_time_of_day_display()}"
+            text += f" - {self.time_of_day}"
         if self.frequency > 1:
             text += f" (x{self.frequency})"
         return text
+
+    def get_time_of_day(self):
+        return TimeOfDay(self.time_of_day).label
+
+    def get_intake_condition(self):
+        return IntakeCondition(self.intake_condition).label
+
+    def get_intake_unit(self):
+        return IntakeUnit(self.intake_unit).label
 
     def get_daily_quantity(self):
         """Calculate quantity per day for this intake"""
@@ -264,7 +268,7 @@ class PosologyHistory(models.Model):
     )
 
     schedule = models.ForeignKey(
-        PosologySchedule,
+        PosologyScheme,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

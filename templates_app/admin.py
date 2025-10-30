@@ -9,7 +9,7 @@ try:
 except ImportError:
     USE_NESTED = False
 
-from .models import Product, PosologySchedule, PosologyIntake, PosologyHistory
+from .models import PosologyScheme, Product, PosologyIntake, PosologyHistory
 
 
 if USE_NESTED:
@@ -20,22 +20,21 @@ if USE_NESTED:
         fields = [
             "order",
             "quantity",
-            "unit",
+            "intake_unit",
             "time_of_day",
-            "specific_time",
             "intake_condition",
             "frequency",
         ]
         ordering = ["order"]
 
-    class PosologyScheduleInline(nested_admin.NestedStackedInline):
-        model = PosologySchedule
+    class PosologySchemeInline(nested_admin.NestedStackedInline):
+        model = PosologyScheme
         extra = 0
         fields = [
             "name",
             "order",
             "duration_value",
-            "duration_type",
+            "duration_unit",
             "instructions",
             "is_active",
         ]
@@ -43,9 +42,9 @@ if USE_NESTED:
         ordering = ["order"]
 
     class ProductAdmin(nested_admin.NestedModelAdmin):
-        list_display = ["__str__", "price"]
+        list_display = ["__str__"]
 
-        inlines = [PosologyScheduleInline]
+        inlines = [PosologySchemeInline]
 
 else:
     # Standard version - click into schedule to see intakes
@@ -55,29 +54,28 @@ else:
         fields = [
             "order",
             "quantity",
-            "unit",
+            "intake_unit",
             "time_of_day",
-            "specific_time",
             "intake_condition",
             "frequency",
         ]
         ordering = ["order"]
 
-    class PosologyScheduleInline(admin.StackedInline):
-        model = PosologySchedule
+    class PosologySchemeInline(admin.StackedInline):
+        model = PosologyScheme
         extra = 0
         fields = [
             "name",
             "order",
             "duration_value",
-            "duration_type",
+            "duration_unit",
             "instructions",
             "is_active",
         ]
         ordering = ["order"]
 
     class ProductAdmin(admin.ModelAdmin):
-        list_display = ["__str__", "get_nutrients", "price"]
+        list_display = ["__str__", "get_nutrients"]
 
         def get_nutrients(self, obj):
             nutrients = []
@@ -85,13 +83,13 @@ else:
                 nutrients.append(nutrient.label)
             return " ,".join(nutrients)
 
-        inlines = [PosologyScheduleInline]
+        inlines = [PosologySchemeInline]
 
 
 # Register PosologySchedule separately so you can edit intakes when clicking on a schedule
 class PosologyScheduleAdmin(admin.ModelAdmin):
     list_display = ["product", "name", "order", "is_active"]
-    list_filter = ["is_active", "duration_type"]
+    list_filter = ["is_active", "duration_unit"]
     search_fields = ["product__label", "name"]
     inlines = [PosologyIntakeInline]
 
@@ -101,13 +99,13 @@ class PosologyIntakeAdmin(admin.ModelAdmin):
     list_display = [
         "schedule",
         "quantity",
-        "unit",
+        "intake_unit",
         "time_of_day",
         "intake_condition",
         "frequency",
         "daily_quantity",
     ]
-    list_filter = ["unit", "time_of_day", "intake_condition"]
+    list_filter = ["intake_unit", "time_of_day", "intake_condition"]
     search_fields = ["schedule__product__label"]
 
     def daily_quantity(self, obj):
@@ -127,4 +125,4 @@ class PosologyHistoryAdmin(admin.ModelAdmin):
 # Register the admins
 # IMPORTANT: Register Product and PosologySchedule AFTER they are defined above
 admin.site.register(Product, ProductAdmin)
-admin.site.register(PosologySchedule, PosologyScheduleAdmin)
+admin.site.register(PosologyScheme, PosologyScheduleAdmin)
