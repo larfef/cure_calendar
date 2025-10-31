@@ -158,7 +158,8 @@ class PosologyScheme(models.Model):
         """Calculate total daily quantity"""
         return sum(intake.quantity * intake.frequency for intake in self.intakes.all())
 
-    def get_formatted_scheme_duration(self):
+    @property
+    def duration(self):
         return f"{self.duration_value} {DurationUnit(self.duration_unit).label}"
 
     def get_formatted_intake_quantity_unit(self):
@@ -240,18 +241,63 @@ class PosologyIntake(models.Model):
             text += f" (x{self.frequency})"
         return text
 
-    def get_time_of_day(self):
+    @property
+    def unit_icon(self):
+        """Return SVG path for the intake unit"""
+        UNIT_ICON = {
+            IntakeUnit.CAPSULE: "templates_app/images/capsule.svg",
+            IntakeUnit.DROP: "templates_app/images/drop.svg",
+            IntakeUnit.ML: "templates_app/images/drop.svg",
+            IntakeUnit.DOSETTE: "templates_app/images/dosette.svg",
+        }
+
+        # Designer make us crazy
+        # Exception when icon depends on unit and quantity
+        if self.intake_unit == "CAPSULE" and self.quantity > 1:
+            return "templates_app/images/capsules.svg"
+        return UNIT_ICON.get(self.intake_unit)
+
+    @property
+    def time_of_day_icon(self):
+        """Return SVG path for the intake time of day"""
+        TIME_OF_DAY = {
+            TimeOfDay.MORNING: "templates_app/images/morning.svg",
+            TimeOfDay.EVENING: "templates_app/images/evening.svg",
+        }
+
+        # Exception when icon depends on intake condition instead of time of day
+        if self.intake_condition == "EMPTY_STOMACH":
+            return "templates_app/images/empty_stomach.svg"
+        return TIME_OF_DAY.get(self.time_of_day)
+
+    @property
+    def time_of_day_label(self):
         return TimeOfDay(self.time_of_day).label
 
     def get_intake_condition(self):
         return IntakeCondition(self.intake_condition).label
 
-    def get_intake_unit(self):
+    @property
+    def unit_label(self):
         return IntakeUnit(self.intake_unit).label
 
-    def get_daily_quantity(self):
+    def is_quantity_whole_number(self):
+        """
+        Check if quantity is a whole number
+        Note : Works for first digit after decimal point only
+        """
+        return not self.quantity * 10 % 10
+
+    @property
+    def daily_quantity(self):
         """Calculate quantity per day for this intake"""
-        return self.quantity * self.frequency
+
+        quantity = self.quantity
+        if self.is_quantity_whole_number():
+            quantity = int(self.quantity)
+        if self.frequency > 1:
+            return f"{self.frequency} x {quantity}"
+        return quantity
 
 
 # Optional: Track posology changes over time

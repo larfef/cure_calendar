@@ -6,5 +6,5 @@
     "[html]": {
         "editor.defaultFormatter": "monosans.djlint",
         "editor.formatOnSave": true
-    }
+    },
 }

@@ -14,6 +14,17 @@ def calendar(request):
         "table": {
             "header": {"1": "Produit", "2": "Moment", "3": "Dosage", "4": "Durée"}
         },
+        "phases": {
+            "1": {"title": "Phase 1", "start": "Jour 1", "end": "Jour 9"},
+            "2": {"title": "Phase 2", "start": "Jour 10", "end": "Jour X"},
+            "subtitle": "Cochez chaque semaine terminée",
+            "start": "Date début de la cure : ...................................",
+            "changes": [
+                {"stop": "Arrêter"},
+                {"continue": "Continuer"},
+                {"add": "Ajouter"},
+            ],
+        },
     }
 
     a5 = {
@@ -22,22 +33,10 @@ def calendar(request):
     }
 
     cure = {
-        "url": "https://example.com/cure/123",
         "phases": {
             "applicability": a5["apply_phases"],
-            "1": {
-                "products": {
-                    "count": len([p for p in a5["products"] if p.phase == 1]),
-                    "items": [p for p in a5["products"] if p.phase == 1],
-                }
-            },
-            "2": {
-                "products": {
-                    "count": len([p for p in a5["products"] if p.phase == 2]),
-                    "items": [p for p in a5["products"] if p.phase == 2],
-                }
-            },
         },
+        "products": sorted(a5["products"], key=lambda p: p.phase),
     }
 
     context = {
