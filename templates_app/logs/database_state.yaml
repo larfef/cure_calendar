@@ -1,0 +1,196 @@
+metadata:
+  exported_at: '2025-11-05T14:39:51.014047'
+  total_products: 24
+products:
+- label: Labotix CoPlus
+  servings: 77
+  first_posology_scheme:
+    duration_value: 52
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 3
+- label: Resvératrol
+  servings: 84
+  first_posology_scheme:
+    duration_value: 76
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 3
+- label: Labotix MB
+  servings: 104
+  first_posology_scheme:
+    duration_value: 48
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 1
+- label: Magnésium
+  servings: 37
+  first_posology_scheme:
+    duration_value: 44
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 2
+- label: TonixX Gold
+  servings: 98
+  first_posology_scheme:
+    duration_value: 62
+    duration_unit: DAYS
+  intakes:
+  - quantity: 4.0
+    frequency: 1
+- label: TonixX Plus
+  servings: 117
+  first_posology_scheme:
+    duration_value: 74
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 3
+- label: L-Tryptophane 500mg
+  servings: 119
+  first_posology_scheme:
+    duration_value: 83
+    duration_unit: DAYS
+  intakes:
+  - quantity: 1.0
+    frequency: 2
+- label: Multi Vitamine B
+  servings: 38
+  first_posology_scheme:
+    duration_value: 72
+    duration_unit: DAYS
+  intakes:
+  - quantity: 4.0
+    frequency: 2
+- label: Omega 3 Epax®
+  servings: 80
+  first_posology_scheme:
+    duration_value: 24
+    duration_unit: DAYS
+  intakes:
+  - quantity: 4.0
+    frequency: 1
+- label: EPP
+  servings: 66
+  first_posology_scheme:
+    duration_value: 64
+    duration_unit: DAYS
+  intakes:
+  - quantity: 4.0
+    frequency: 2
+- label: ADP Biotics
+  servings: 69
+  first_posology_scheme:
+    duration_value: 31
+    duration_unit: DAYS
+  intakes:
+  - quantity: 4.0
+    frequency: 2
+- label: Mucopure 250 (avec Glutamine)
+  servings: 112
+  first_posology_scheme:
+    duration_value: 79
+    duration_unit: DAYS
+  intakes:
+  - quantity: 4.0
+    frequency: 2
+- label: NADH+
+  servings: 52
+  first_posology_scheme:
+    duration_value: 39
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 1
+- label: Adrenex
+  servings: 62
+  first_posology_scheme:
+    duration_value: 42
+    duration_unit: DAYS
+  intakes:
+  - quantity: 1.0
+    frequency: 2
+- label: Ashwagandha Bio KSM-66
+  servings: 46
+  first_posology_scheme:
+    duration_value: 72
+    duration_unit: DAYS
+  intakes:
+  - quantity: 3.0
+    frequency: 1
+- label: ERGY Calme
+  servings: 74
+  first_posology_scheme:
+    duration_value: 21
+    duration_unit: DAYS
+  intakes:
+  - quantity: 1.0
+    frequency: 3
+- label: Allicin
+  servings: 106
+  first_posology_scheme:
+    duration_value: 55
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 1
+- label: Labotix Multifibre
+  servings: 106
+  first_posology_scheme:
+    duration_value: 27
+    duration_unit: DAYS
+  intakes:
+  - quantity: 1.0
+    frequency: 2
+- label: Berberine
+  servings: 90
+  first_posology_scheme:
+    duration_value: 34
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 3
+- label: Tyrosine
+  servings: 105
+  first_posology_scheme:
+    duration_value: 28
+    duration_unit: DAYS
+  intakes:
+  - quantity: 1.0
+    frequency: 3
+- label: Resveratrol
+  servings: 40
+  first_posology_scheme:
+    duration_value: 64
+    duration_unit: DAYS
+  intakes:
+  - quantity: 2.0
+    frequency: 2
+- label: Mo-Zyme
+  servings: 84
+  first_posology_scheme:
+    duration_value: 25
+    duration_unit: DAYS
+  intakes:
+  - quantity: 4.0
+    frequency: 3
+- label: Permea Intest
+  servings: 53
+  first_posology_scheme:
+    duration_value: 70
+    duration_unit: DAYS
+  intakes:
+  - quantity: 3.0
+    frequency: 1
+- label: Alfa Energy
+  servings: 61
+  first_posology_scheme:
+    duration_value: 46
+    duration_unit: DAYS
+  intakes:
+  - quantity: 1.0
+    frequency: 1

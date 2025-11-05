@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from templates_app.models import Product
+from templates_app.models.product import Product
 
 
 def calendar(request):
@@ -59,60 +59,60 @@ def cure(request):
             "Dosage",
             "Durée",
         ],
-        "cure_delay": "Délai:",
-        "cure_product_recommended": "Produit recommandé",
+        "cure_delay": "Démarrer au jour",
+        "cure_product_recommended": "Nutriments recommandés",
         "cure_command": "Commander ma cure",
         "cure_mail": "Envoyer par email",
     }
 
     a5 = {
         "apply_phases": True,
-        "products": Product.objects.all(),
-        # "products": [
-        #     {
-        #         "phase": 1,
-        #         "nutrients": [
-        #             {"label": "Vitamine D3"},
-        #             {"label": "Magnésium"},
-        #         ],
-        #         "delay": 0,
-        #         "posology": "2 gélules le matin",
-        #         "duration": "30 jours",
-        #         "label": "Complexe Vitamine D + Magnésium",
-        #     },
-        #     {
-        #         "phase": 1,
-        #         "nutrients": [
-        #             {"label": "Oméga 3"},
-        #         ],
-        #         "delay": 5,
-        #         "posology": "1 gélule au repas",
-        #         "duration": "60 jours",
-        #         "label": "Oméga 3 Premium",
-        #     },
-        #     {
-        #         "phase": 2,
-        #         "nutrients": [
-        #             {"label": "Probiotiques"},
-        #             {"label": "Zinc"},
-        #         ],
-        #         "delay": 0,
-        #         "posology": "1 gélule le soir",
-        #         "duration": "30 jours",
-        #         "label": "Probio + Zinc",
-        #     },
-        #     {
-        #         "phase": 2,
-        #         "nutrients": [
-        #             {"label": "Probiotiques"},
-        #             {"label": "Zinc"},
-        #         ],
-        #         "delay": 0,
-        #         "posology": "1 gélule le soir",
-        #         "duration": "30 jours",
-        #         "label": "Probio + Zinc",
-        #     },
-        # ],
+        # "products": Product.objects.all(),
+        "products": [
+            {
+                "phase": 1,
+                "nutrients": [
+                    {"label": "Vitamine D3"},
+                    {"label": "Magnésium"},
+                ],
+                "delay": 0,
+                "posology": "2 gélules le matin",
+                "duration": "30 jours",
+                "label": "Complexe Vitamine D + Magnésium",
+            },
+            {
+                "phase": 2,
+                "nutrients": [
+                    {"label": "Oméga 3"},
+                ],
+                "delay": 5,
+                "posology": "1 gélule au repas",
+                "duration": "60 jours",
+                "label": "Oméga 3 Premium",
+            },
+            {
+                "phase": 2,
+                "nutrients": [
+                    {"label": "Probiotiques"},
+                    {"label": "Zinc"},
+                ],
+                "delay": 0,
+                "posology": "1 gélule le soir",
+                "duration": "30 jours",
+                "label": "Probio + Zinc",
+            },
+            {
+                "phase": 2,
+                "nutrients": [
+                    {"label": "Probiotiques"},
+                    {"label": "Zinc"},
+                ],
+                "delay": 0,
+                "posology": "1 gélule le soir",
+                "duration": "30 jours",
+                "label": "Probio + Zinc",
+            },
+        ],
         "link": "https://example.com/order",
         "static_content": {
             "simplycure_text": "Commandez facilement vos compléments sur Symp",
@@ -128,14 +128,14 @@ def cure(request):
         "phases": {
             "1": {
                 "products": {
-                    "count": len([p for p in a5["products"] if p.phase == 1]),
-                    "items": [p for p in a5["products"] if p.phase == 1],
+                    "count": len([p for p in a5["products"] if p["phase"] == 1]),
+                    "items": [p for p in a5["products"] if p["phase"] == 1],
                 }
             },
             "2": {
                 "products": {
-                    "count": len([p for p in a5["products"] if p.phase == 2]),
-                    "items": [p for p in a5["products"] if p.phase == 2],
+                    "count": len([p for p in a5["products"] if p["phase"] == 2]),
+                    "items": [p for p in a5["products"] if p["phase"] == 2],
                 }
             },
         },

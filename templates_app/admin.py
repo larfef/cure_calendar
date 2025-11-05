@@ -9,8 +9,10 @@ try:
 except ImportError:
     USE_NESTED = False
 
-from .models import PosologyScheme, Product, PosologyIntake, PosologyHistory
-
+from templates_app.models.posology_intake import PosologyIntake
+from templates_app.models.posology_scheme import PosologyScheme
+from templates_app.models.posology_history import PosologyHistory
+from templates_app.models.product import Product
 
 if USE_NESTED:
     # Nested version - shows intakes within schedules
@@ -97,7 +99,7 @@ class PosologyScheduleAdmin(admin.ModelAdmin):
 @admin.register(PosologyIntake)
 class PosologyIntakeAdmin(admin.ModelAdmin):
     list_display = [
-        "schedule",
+        "scheme",
         "quantity",
         "intake_unit",
         "time_of_day",
@@ -106,7 +108,7 @@ class PosologyIntakeAdmin(admin.ModelAdmin):
         "daily_quantity",
     ]
     list_filter = ["intake_unit", "time_of_day", "intake_condition"]
-    search_fields = ["schedule__product__label"]
+    search_fields = ["scheme__product__label"]
 
     def daily_quantity(self, obj):
         return obj.get_daily_quantity()

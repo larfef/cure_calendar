@@ -1,0 +1,61 @@
+metadata:
+  exported_at: '2025-11-05T14:39:51.035430'
+  total_products_in_sample: 19
+sample:
+- label: TonixX Plus
+  delay: null
+  phase: 1
+- label: Labotix Multifibre
+  delay: null
+  phase: 2
+- label: ERGY Calme
+  delay: 8
+  phase: 1
+- label: Allicin
+  delay: null
+  phase: 2
+- label: Berberine
+  delay: null
+  phase: 2
+- label: Permea Intest
+  delay: null
+  phase: 1
+- label: Ashwagandha Bio KSM-66
+  delay: null
+  phase: 2
+- label: Omega 3 Epax®
+  delay: 2
+  phase: 1
+- label: ADP Biotics
+  delay: 9
+  phase: 1
+- label: Labotix CoPlus
+  delay: null
+  phase: 1
+- label: Magnésium
+  delay: null
+  phase: 1
+- label: EPP
+  delay: null
+  phase: 1
+- label: TonixX Gold
+  delay: 2
+  phase: 2
+- label: Mucopure 250 (avec Glutamine)
+  delay: null
+  phase: 1
+- label: L-Tryptophane 500mg
+  delay: 5
+  phase: 1
+- label: Alfa Energy
+  delay: 7
+  phase: 1
+- label: Adrenex
+  delay: null
+  phase: 2
+- label: Labotix MB
+  delay: null
+  phase: 2
+- label: Resveratrol
+  delay: 12
+  phase: 2
