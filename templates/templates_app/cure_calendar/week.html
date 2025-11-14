@@ -1,42 +1,44 @@
 {% load static %}
 <div class="week-container">
     <div class="week-container_intake">
-        {% if current.time_col and current.morning.enabled %}
+        {% if week.time_col and week.morning.enabled %}
             <div class="week-col__time">
-                {% if current.table_header %}<div class="week-content__left-corner"></div>{% endif %}
+                {% if week.table_header %}<div class="week-content__left-corner"></div>{% endif %}
                 <div class="week-content__icon-container week-col__morning-background">
                     <img class="week-content__icon week-content__icon-morning-size"
                          src="{% static 'templates_app/images/morning.svg' %}">
                 </div>
             </div>
         {% endif %}
-        {% if current.morning.enabled %}
+        {% if week.morning.enabled %}
             <div>
-                {% with rows=current.morning.rows table_header=current.table_header %}
-                    {% include "templates_app/cure_calendar/table.html" %}
+                {% with content=week.morning.rows table_header=week.table_header %}
+                    {% include "templates_app/cure_calendar/table.html" with rows=week.morning.row_count %}
                 {% endwith %}
             </div>
         {% endif %}
     </div>
     <div class="week-container_intake">
-        {% if current.time_col and current.evening.enabled %}
+        {% if week.time_col and week.evening.enabled %}
             <div class="week-col__time">
-                {% if current.table_header and not current.morning.enabled %}<div class="week-content__left-corner"></div>{% endif %}
+                {% if week.table_header and not week.morning.enabled %}<div class="week-content__left-corner"></div>{% endif %}
                 <div class="week-content__icon-container week-col__evening-background">
                     <img class="week-content__icon week-content__icon-evening-size"
                          src="{% static 'templates_app/images/evening.svg' %}">
                 </div>
             </div>
         {% endif %}
-        {% if current.evening.enabled %}
+        {% if week.evening.enabled %}
             <div>
-                {% with rows=current.evening.rows %}
-                    {% if not current.morning.enabled %}
-                        {% with table_header=True %}
-                            {% include "templates_app/cure_calendar/table.html" %}
+                {% with rows=week.evening.rows %}
+                    {% if not week.morning.enabled %}
+                        {% with table_header=True content=week.evening.rows %}
+                            {% include "templates_app/cure_calendar/table.html" with rows=week.morning.row_count %}
                         {% endwith %}
                     {% else %}
-                        {% include "templates_app/cure_calendar/table.html" %}
+                        {% with content=week.evening.rows %}
+                            {% include "templates_app/cure_calendar/table.html" with rows=week.morning.row_count %}
+                        {% endwith %}
                     {% endif %}
                 {% endwith %}
             </div>

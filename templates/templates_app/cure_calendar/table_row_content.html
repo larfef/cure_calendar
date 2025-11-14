@@ -21,5 +21,12 @@
     {% elif current.type == 'stop' %}
         <div class="line-container__stop" style="{{ current.stop_style }}">{{ text.line.stop }}</div>
         <div class="line-red" style="{{ current.line_style }}"></div>
+    {% elif current.type == 'pause' %}
+        <div class="pause-container" style="{{ current.line_style }}">
+            <div class="pause-line__dashed" style="{{ current.line_style }}"></div>
+            <div class="pause-container__text">
+                <div class="pause-text">{{ text.line.pause|default:"Pause" }}</div>
+            </div>
+        </div>
     {% endif %}
 </div>

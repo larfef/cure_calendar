@@ -47,3 +47,36 @@
     align-self: center;
 
 }
+
+.pause-container {
+    display: flex;
+    justify-content: center;
+}
+
+.pause-line__dashed {
+    border-top: 1px dashed grey;
+    align-self: center;
+}
+
+.pause-container__text {
+    position: absolute;
+    height: 18px;
+    display: inline-flex;
+    padding: 2px 4px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border: 0.4px solid var(--neutral-grey-500, #909B90);
+    background: var(--neutral-grey-200, #EEE);
+    align-self: center;
+}
+
+.pause-text {
+    color: var(--neutral-gray-700, #3A423A);
+    text-align: center;
+    font-size: 8px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 8px;
+    letter-spacing: -0.16px;
+}

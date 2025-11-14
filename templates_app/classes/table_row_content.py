@@ -68,13 +68,15 @@ class TableRowContent:
 
     def _get_line_style(self):
         """Calculate inline style for the line itself"""
+
         styles = [f"width: {self.width}"]
 
         if not self.product:
-            # Add margin-left for all types
-            styles.append(
-                f"margin-left: calc({self.start} * calc(var(--cell-width) + 1px))"
-            )
+            # Add margin-left for all types except pause (pause handles its own positioning)
+            if self.type != "pause":
+                styles.append(
+                    f"margin-left: calc({self.start} * calc(var(--cell-width) + 1px))"
+                )
 
             # Add margin-right for stop type
             if self.type == "stop" and self.end:

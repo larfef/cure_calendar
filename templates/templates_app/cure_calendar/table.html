@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <div class="table-container">
     {% if table_header %}
         <div class="table-header">
@@ -8,11 +9,13 @@
             {% endfor %}
         </div>
     {% endif %}
-    {% for row in rows %}
+    {% for row in "0"|center:rows %}
         <div class="table-content__line {% if forloop.first %}table-content__line--first{% endif %}">
-            {% with current=row %}
-                {% include "templates_app/cure_calendar/table_row_content.html" %}
-            {% endwith %}
+            {% if forloop.counter0 < content|length %}
+                {% with current=content|index:forloop.counter0 %}
+                    {% include "templates_app/cure_calendar/table_row_content.html" %}
+                {% endwith %}
+            {% endif %}
             {% with n_cell=text.table.header|length %}
                 {% for i in "0"|center:n_cell %}
                     <div class="table-content__cell"></div>

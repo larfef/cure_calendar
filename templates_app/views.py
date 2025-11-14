@@ -98,37 +98,25 @@ weeks_2 = [
                         "icon": "pill.svg",
                     },
                 ).get_context(),
-                "",
-                "",
             ],
+            "row_count": 5,
         },
         "evening": {
             "enabled": True,
             "rows": [
                 TableRowContent(
-                    line_type="default",
-                    start=3,
-                    restart=False,
-                    product={
-                        "name": "Magnésium",
-                        "intake": "3x",
-                        "icon": "pill.svg",
-                    },
+                    line_type="stop",
+                    start=0,
+                    end=4,
+                    restart=True,
                 ).get_context(),
                 TableRowContent(
-                    line_type="default",
-                    start=3,
+                    line_type="pause",
+                    start=1,
                     restart=False,
-                    product={
-                        "name": "Magnésium",
-                        "intake": "3x",
-                        "icon": "pill.svg",
-                    },
-                ).get_context(),
-                TableRowContent(
-                    line_type="default", start=2, end=6, restart=False
                 ).get_context(),
             ],
+            "row_count": 5,
         },
         "time_col": True,
         "table_header": True,
@@ -154,32 +142,15 @@ weeks_2 = [
                     restart=False,
                 ).get_context(),
             ],
+            "row_count": 5,
         },
         "evening": {
             "enabled": True,
             "rows": [
                 TableRowContent(
                     line_type="default",
-                    start=3,
-                    restart=False,
-                    product={
-                        "name": "Magnésium",
-                        "intake": "3x",
-                        "icon": "pill.svg",
-                    },
-                ).get_context(),
-                TableRowContent(
-                    line_type="default",
-                    start=3,
-                    restart=False,
-                    product={
-                        "name": "Magnésium",
-                        "intake": "3x",
-                        "icon": "pill.svg",
-                    },
-                ).get_context(),
-                TableRowContent(
-                    line_type="default", start=2, end=6, restart=False
+                    start=2,
+                    restart=True,
                 ).get_context(),
             ],
             "row_count": 5,

@@ -56,15 +56,17 @@
         </style>
     </head>
     <body>
-        {% for week in weeks %}
-            <div class="week-outer-wrapper"
-                 style="margin-right: {% if forloop.counter == 1 or forloop.counter == 3 %}7px{% elif forloop.counter == 2 %}31px{% endif %};
-                        position: relative;
-                        z-index: {{ forloop.revcounter }}">
-                {% with current=week %}
-                    {% include "templates_app/cure_calendar/week.html" %}
-                {% endwith %}
-            </div>
+        {% for month in months %}
+            {% for week in month.weeks %}
+                <div class="week-outer-wrapper"
+                     style="margin-right: {% if forloop.counter == 1 or forloop.counter == 3 %}7px{% elif forloop.counter == 2 %}31px{% endif %};
+                            position: relative;
+                            z-index: {{ forloop.revcounter }}">
+                    {% include "templates_app/cure_calendar/week.html" with rows=5 %}
+                </div>
+            {% endfor %}
         {% endfor %}
     </body>
 </html>
+<!-- <div class="line-container__stop" style="{{ current.stop_style }}">{{ text.line.stop }}</div>
+<div class="line-red" style="{{ current.line_style }}"></div> -->
