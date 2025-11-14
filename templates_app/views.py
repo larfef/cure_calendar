@@ -1,109 +1,193 @@
 from django.shortcuts import render
 from templates_app.models.product import Product
+from templates_app.classes.table_row_content import TableRowContent
 
+# Edge case
+# Product overflow of week table for week 4 and 8 ==> It goes out of template size
 
-# green-line
+weeks_1 = [
+    {
+        "morning": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    line_type="default", start=6, restart=True
+                ).get_context(),
+            ],
+        },
+        "evening": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    line_type="default",
+                    start=3,
+                    restart=False,
+                    product={
+                        "name": "Magnésium",
+                        "intake": "3x",
+                        "icon": "pill.svg",
+                    },
+                ).get_context(),
+                TableRowContent(
+                    line_type="default", start=2, end=6, restart=False
+                ).get_context(),
+            ],
+        },
+        "time_col": True,
+        "table_header": True,
+    },
+    {
+        "morning": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    line_type="stop", start=0, end=3, restart=False
+                ).get_context(),
+            ],
+        },
+        "evening": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    line_type="arrow",
+                    start=0,
+                    restart=False,
+                ).get_context(),
+                TableRowContent(
+                    line_type="stop", start=0, end=6, restart=False
+                ).get_context(),
+            ],
+        },
+        "time_col": False,
+        "table_header": True,
+    },
+]
 
-# type
-# arrow -->
-# stop --<
-# default --
-
-# start
-# Integer from 1 to 7 to know on wich day start the line
-
-# product display
-# full ==> name , border box, posology,
-# name ==> name
-# None ==> no display
-# pause ==> grey line
-
-
-class LineRenderer:
-    """Handles line rendering logic for cure calendar"""
-
-    def __init__(
-        self,
-        line_type,
-        start,
-        end=None,
-        width=None,
-        restart=False,
-        product=False,
-        stop=False,
-    ):
-        """
-        Args:
-            line_type: 'default', 'arrow', or 'stop'
-            start: Integer from 0-7 indicating start day
-            end: Integer from 0-7 indicating end day (optional)
-            width: Width value (default: "100%")
-            restart: Boolean indicating if this is a restart line
-            stop: Boolean indicating if this is a stop line
-        """
-        self.type = line_type
-        self.start = start
-        self.product = product
-        self.end = end
-        self.width = width or "100%"
-        self.restart = restart and self.type != "stop"
-        self.stop = stop
-
-    def get_context(self):
-        """Returns pre-calculated values for template"""
-        return {
-            "type": self.type,
-            "restart": self.restart,
-            "product": self.product,
-            "stop": self.stop,
-            "width": self.width,
-            "start": self.start,
-            "end": self.end,
-            "end_modulo": self._calculate_end_modulo(),
-            # Pre-calculated styles
-            "restart_style": self._get_restart_style() if self.restart else "",
-            "stop_style": self._get_stop_style(),
-            "line_style": self._get_line_style(),
-            "margin_left": self._get_margin_left(),
-        }
-
-    def _calculate_end_modulo(self):
-        """Calculate end_modulo value"""
-        if self.end:
-            return 7 - self.end
-
-    def _get_restart_style(self):
-        """Calculate inline style for restart indicator"""
-        if self.start < 6:
-            return f"margin-left: calc({self.start} * calc(var(--cell-width) + 1px))"
-        else:
-            return f"right: 1px;"
-
-    def _get_stop_style(self):
-        """Calculate inline style for stop indicator"""
-        end_modulo = self._calculate_end_modulo()
-        return f"margin-right: calc((var(--cell-width) * (7 - {self.end})) + {end_modulo}px)"
-
-    def _get_margin_left(self):
-        return f"margin-left: calc({self.start} * calc(var(--cell-width) + 1px))"
-
-    def _get_line_style(self):
-        """Calculate inline style for the line itself"""
-        styles = [f"width: {self.width}"]
-
-        # Add margin-left for all types
-        styles.append(
-            f"margin-left: calc({self.start} * calc(var(--cell-width) + 1px))"
-        )
-
-        # Add margin-right for stop type
-        if self.type == "stop" and self.end:
-            end_modulo = self._calculate_end_modulo()
-            styles.append(
-                f"margin-right: calc((var(--cell-width) * (7 - {self.end})) + {end_modulo}px)"
-            )
-
-        return "; ".join(styles)
+weeks_2 = [
+    {
+        "morning": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    line_type="default",
+                    start=0,
+                    restart=False,
+                    product={
+                        "name": "Magnésium",
+                        "intake": "3x",
+                        "icon": "pill.svg",
+                    },
+                ).get_context(),
+                TableRowContent(
+                    line_type="default",
+                    start=1,
+                    restart=False,
+                    product={
+                        "name": "Magnésium",
+                        "intake": "3x",
+                        "icon": "pill.svg",
+                    },
+                ).get_context(),
+                TableRowContent(
+                    line_type="default",
+                    start=6,
+                    restart=False,
+                    product={
+                        "name": "Magnésium",
+                        "intake": "3x",
+                        "icon": "pill.svg",
+                    },
+                ).get_context(),
+                "",
+                "",
+            ],
+        },
+        "evening": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    line_type="default",
+                    start=3,
+                    restart=False,
+                    product={
+                        "name": "Magnésium",
+                        "intake": "3x",
+                        "icon": "pill.svg",
+                    },
+                ).get_context(),
+                TableRowContent(
+                    line_type="default",
+                    start=3,
+                    restart=False,
+                    product={
+                        "name": "Magnésium",
+                        "intake": "3x",
+                        "icon": "pill.svg",
+                    },
+                ).get_context(),
+                TableRowContent(
+                    line_type="default", start=2, end=6, restart=False
+                ).get_context(),
+            ],
+        },
+        "time_col": True,
+        "table_header": True,
+    },
+    {
+        "morning": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    line_type="stop",
+                    start=0,
+                    end=5,
+                    restart=False,
+                ).get_context(),
+                TableRowContent(
+                    line_type="arrow",
+                    start=0,
+                    restart=False,
+                ).get_context(),
+                TableRowContent(
+                    line_type="default",
+                    start=0,
+                    restart=False,
+                ).get_context(),
+            ],
+        },
+        "evening": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    line_type="default",
+                    start=3,
+                    restart=False,
+                    product={
+                        "name": "Magnésium",
+                        "intake": "3x",
+                        "icon": "pill.svg",
+                    },
+                ).get_context(),
+                TableRowContent(
+                    line_type="default",
+                    start=3,
+                    restart=False,
+                    product={
+                        "name": "Magnésium",
+                        "intake": "3x",
+                        "icon": "pill.svg",
+                    },
+                ).get_context(),
+                TableRowContent(
+                    line_type="default", start=2, end=6, restart=False
+                ).get_context(),
+            ],
+            "row_count": 5,
+        },
+        "time_col": False,
+        "table_header": True,
+    },
+]
 
 
 assets_context = {
@@ -117,68 +201,8 @@ assets_context = {
             "restart": "Reprendre",
         },
     },
-    "weeks": [
-        {
-            "morning": {
-                "enabled": True,
-                "rows": [
-                    LineRenderer(
-                        line_type="arrow", start=6, restart=False
-                    ).get_context(),
-                ],
-            },
-            "evening": {
-                "enabled": True,
-                "rows": [
-                    LineRenderer(
-                        line_type="arrow",
-                        start=4,
-                        restart=False,
-                        product={
-                            "name": "Magnésium",
-                            "intake": "3x",
-                            "icon": "pill.svg",
-                        },
-                    ).get_context(),
-                    LineRenderer(
-                        line_type="stop", start=0, end=6, restart=False
-                    ).get_context(),
-                ],
-            },
-            "time_col": True,
-            "table_header": True,
-        },
-        {
-            "morning": {
-                "enabled": True,
-                "rows": [
-                    LineRenderer(
-                        line_type="arrow", start=6, restart=False
-                    ).get_context(),
-                ],
-            },
-            "evening": {
-                "enabled": True,
-                "rows": [
-                    LineRenderer(
-                        line_type="arrow",
-                        start=0,
-                        restart=False,
-                    ).get_context(),
-                    LineRenderer(
-                        line_type="stop", start=0, end=6, restart=False
-                    ).get_context(),
-                ],
-            },
-            "time_col": False,
-            "table_header": True,
-        },
-    ],
-    "content": {
-        "line": LineRenderer(
-            line_type="arrow", start=6, end=6, restart=False
-        ).get_context(),
-    },
+    "weeks": weeks_2,
+    "months": [{"weeks": weeks_2, "row_count": {"morning": 5, "evening": 5}}],
 }
 
 

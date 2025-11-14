@@ -57,12 +57,14 @@
     </head>
     <body>
         {% for week in weeks %}
-            <div {% if forloop.counter == 1 or forloop.counter == 3 %} style="margin-right: 7px" {% elif forloop.counter == 2 %} style="margin-right: 31px"{% endif %}>
+            <div class="week-outer-wrapper"
+                 style="margin-right: {% if forloop.counter == 1 or forloop.counter == 3 %}7px{% elif forloop.counter == 2 %}31px{% endif %};
+                        position: relative;
+                        z-index: {{ forloop.revcounter }}">
                 {% with current=week %}
                     {% include "templates_app/cure_calendar/week.html" %}
                 {% endwith %}
             </div>
         {% endfor %}
-        {% include "templates_app/cure_calendar/intake.html" %}
     </body>
 </html>
