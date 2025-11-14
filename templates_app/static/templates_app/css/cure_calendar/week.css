@@ -1,0 +1,53 @@
+.week-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.week-container_intake {
+    display: flex;
+    height: fit-content;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.week-content__left-corner {
+    height: 13px;
+    flex-shrink: 0;
+    background: var(--neutral-gray-50, #FAFAFA);
+    border-top: 1px solid var(--neutral-gray-300, #D1D9D8);
+    border-bottom: 1px solid var(--neutral-gray-300, #D1D9D8);
+    border-left: 1px solid var(--neutral-gray-300, #D1D9D8);
+}
+
+.week-col__morning-background {
+    background: #FEFDF3;
+}
+
+.week-col__evening-background {
+    background: #EFFAFF;
+}
+
+.week-content__icon-container {
+    width: 27.5px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.week-content__icon-morning-size {
+    width: 15px;
+    height: 15px;
+}
+
+.week-content__icon-evening-size {
+    width: 10px;
+    height: 10px;
+}
+
+.week-col__time{
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+}

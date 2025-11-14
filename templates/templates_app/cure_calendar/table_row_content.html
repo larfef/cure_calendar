@@ -1,0 +1,25 @@
+{% load static %}
+<div class="line-container" style="position: absolute; width: 100%;">
+    {% if current.product %}
+        {% include "templates_app/cure_calendar/intake.html" %}
+    {% endif %}
+    {% if current.restart %}
+        <div class="line-container__restart" style="{{ current.restart_style }}">{{ text.line.restart }}</div>
+    {% endif %}
+    {% if current.type == 'default' %}
+        <div class="line-green" style="{{ current.line_style }}"></div>
+    {% elif current.type == 'arrow' %}
+        <div style="display: flex;
+                    position: absolute;
+                    align-self: center;
+                    width: 100%">
+            <div class="line-green" style="{{ current.line_style }}"></div>
+            <img width="4"
+                 height="7"
+                 src="/static/templates_app/images/green-arrow.png">
+        </div>
+    {% elif current.type == 'stop' %}
+        <div class="line-container__stop" style="{{ current.stop_style }}">{{ text.line.stop }}</div>
+        <div class="line-red" style="{{ current.line_style }}"></div>
+    {% endif %}
+</div>

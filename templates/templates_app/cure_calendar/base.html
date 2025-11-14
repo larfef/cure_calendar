@@ -21,7 +21,7 @@
               href="{% static 'templates_app/css/cure_calendar/phase_change.css' %}">
         <style>
             @page {
-                size: A4;
+                size: A4 landscape;
                 margin: 0;
             }
 
@@ -37,9 +37,9 @@
             body {
                 margin: 0;
                 padding: 0;
-                width: 210mm;
+                height: 210mm;
                 /* A4 width */
-                height: 297mm;
+                width: 297mm;
                 /* A4 height */
             }
 
@@ -48,14 +48,16 @@
                 justify-content: center;
                 align-items: flex-start;
                 word-wrap: break-word;
+                font-family: 'Rethink Sans';
             }
         </style>
     </head>
     <body>
-        <div style="width: 595px;
-                    height: 842px;
-                    padding: 16px;
+        <div style="width: 842px;
+                    height: 595px;
+                    padding: 12px;
                     background: white;
+                    border: 1px solid black;
                     overflow: hidden;
                     flex-direction: column;
                     justify-content: flex-start;
@@ -143,12 +145,12 @@
                             </div>
                         </div>
                     </div>
-                    {% if cure.phases.applicability %}
+                    <!-- {% if cure.phases.applicability %}
                         {% regroup cure.products by phase as products_group %}
                         {% with table_header=text.table.header products=products_group.0.1 %}
                             {% include "templates_app/cure_calendar/table.html" %}
                         {% endwith %}
-                    {% endif %}
+                    {% endif %} -->
                 </div>
                 <div style="align-self: stretch;
                             flex-direction: column;
@@ -226,11 +228,11 @@
                     </div>
                     {% include "templates_app/cure_calendar/phase_change.html" %}
                 </div>
-                {% if cure.phases.applicability %}
+                <!-- {% if cure.phases.applicability %}
                     {% with table_header=text.table.header products=products_group.1.1 %}
                         {% include "templates_app/cure_calendar/table.html" %}
                     {% endwith %}
-                {% endif %}
+                {% endif %} -->
                 <div style="align-self: stretch;
                             flex: 1 1 0;
                             padding: 8px;

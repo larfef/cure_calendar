@@ -1,0 +1,11 @@
+{% load static %}
+<div class="product-container" style="{{ current.margin_left }}">
+    <div class="product-name">{{ current.product.name }}</div>
+    <div class="intake-container">
+        <div class="intake-text">{{ current.product.intake }}</div>
+        <img src="{% static 'templates_app/images/' %}{{ current.product.icon }}"
+             width="14"
+             height="12"
+             alt="Pill">
+    </div>
+</div>

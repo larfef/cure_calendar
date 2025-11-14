@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title }}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;500;600;700&display=swap"
+              rel="stylesheet">
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'templates_app/css/cure_calendar/common.css' %}">
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'templates_app/css/cure_calendar/table.css' %}">
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'templates_app/css/cure_calendar/week.css' %}">
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'templates_app/css/cure_calendar/line.css' %}">
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'templates_app/css/cure_calendar/intake.css' %}">
+        <style>
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                height: 210mm;
+                /* A4 width */
+                width: 297mm;
+                /* A4 height */
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                word-wrap: break-word;
+                font-family: 'Rethink Sans';
+            }
+        </style>
+    </head>
+    <body>
+        {% for week in weeks %}
+            <div {% if forloop.counter == 1 or forloop.counter == 3 %} style="margin-right: 7px" {% elif forloop.counter == 2 %} style="margin-right: 31px"{% endif %}>
+                {% with current=week %}
+                    {% include "templates_app/cure_calendar/week.html" %}
+                {% endwith %}
+            </div>
+        {% endfor %}
+        {% include "templates_app/cure_calendar/intake.html" %}
+    </body>
+</html>

@@ -1,49 +1,24 @@
 {% load static %}
-<table class="table-container">
-    <!-- Table Header -->
-    <thead>
-        <tr class="table-header">
-            <th class="table-header__cell">{{ table_header.1 }}</th>
-            <th class="table-header__cell">{{ table_header.2 }}</th>
-            <th class="table-header__cell">{{ table_header.3 }}</th>
-            <th class="table-header__cell">{{ table_header.4 }}</th>
-        </tr>
-    </thead>
-    <!-- Table Body -->
-    <tbody>
-        {% for product in products %}
-            <tr class="table-row">
-                <td class="table-cell--product">{{ product.label }}</td>
-                {% with scheme=product.posology_schemes.first intakes=product.posology_schemes.first.intakes.all|dictsort:"order" %}
-                    <td class="table-cell--time">
-                        <div class="cell-content">
-                            {% for intake in intakes %}
-                                {% if intake.time_of_day_icon %}
-                                    <img class="cell-content__icon"
-                                         src="{% static intake.time_of_day_icon|stringformat:'s' %}">
-                                {% endif %}
-                                <span class="cell-content__text">{{ intake.time_of_day_label }}</span>
-                                {% if forloop.counter < intakes|length %}<span class="cell-content__text">+</span>{% endif %}
-                            {% endfor %}
-                        </div>
-                    </td>
-                    <td class="table-cell--dosage">
-                        <div class="cell-content--dosage">
-                            {% if intakes.0.unit_icon %}
-                                <img class="cell-content__icon"
-                                     src="{% static intakes.0.unit_icon|stringformat:'s' %}"
-                                     alt="Gélule">
-                            {% endif %}
-                            {% for intake in intakes %}
-                                <span class="cell-content__text">{{ intake.daily_quantity }} {{ intake.unit_label }}</span>
-                            {% endfor %}
-                        </div>
-                    </td>
-                    <td class="table-cell--duration">
-                        <span class="cell-content__text">{{ scheme.duration }}</span>
-                    </td>
-                {% endwith %}
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="table-container">
+    {% if table_header %}
+        <div class="table-header">
+            {% for item in text.table.header %}
+                <div class="table-header__cell">{{ item }}</div>
+                {% if forloop.counter < text.table.header|length %}<div class="table-header__vertical-line"></div>{% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% for row in rows %}
+        <div class="table-content__line {% if forloop.first %}table-content__line--first{% endif %}">
+            {% with current=row %}
+                {% include "templates_app/cure_calendar/table_row_content.html" %}
+            {% endwith %}
+            {% with n_cell=text.table.header|length %}
+                {% for i in "0"|center:n_cell %}
+                    <div class="table-content__cell"></div>
+                    {% if forloop.counter < n_cell %}<div class="table-content__vertical-line"></div>{% endif %}
+                {% endfor %}
+            {% endwith %}
+        </div>
+    {% endfor %}
+</div>

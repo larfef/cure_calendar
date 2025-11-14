@@ -11,8 +11,7 @@
 /* Primary Header Section (Green) */
 .header-primary {
     align-self: stretch;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding: 6px 0;
     background: var(--primary-green-500);
     border-radius: 2px;
     flex-direction: column;
@@ -23,13 +22,13 @@
 }
 
 .header-primary__title {
-    width: 547px;
-    height: 24px;
+    width: 718px;
     text-align: center;
     color: var(--text-white);
-    font-size: 24px;
+    font-size: 16px;
     font-weight: 600;
-    line-height: 24px;
+    line-height: 16px;
+    letter-spacing: -0.32px;
 }
 
 .header-primary__subtitle {
