@@ -70,6 +70,7 @@ class TableRowContent:
         """Calculate inline style for the line itself"""
 
         styles = [f"width: {self.width}"]
+        # styles = []
 
         if not self.product:
             # Add margin-left for all types except pause (pause handles its own positioning)

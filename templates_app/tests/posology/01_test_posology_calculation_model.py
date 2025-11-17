@@ -19,7 +19,6 @@ class TestPosolgyCalculationModel(TestCase):
         log_database_state_to_yaml()
 
         self.a5_products = get_randomized_products_sample()
-        log_randomized_sample_to_yaml(self.a5_products)
 
         self.calculator = PosologyCalculationModel(self.a5_products)
         pass

@@ -1,9 +1,51 @@
+import random
 from django.shortcuts import render
 from templates_app.models.product import Product
 from templates_app.classes.table_row_content import TableRowContent
+from templates_app.tests.posology.init_database import (
+    create_mock_product_data,
+    labels,
+)
 
 # Edge case
 # Product overflow of week table for week 4 and 8 ==> It goes out of template size
+
+
+def line_type(n):
+    if n == 0:
+        return ""
+
+
+empty_week = [
+    {
+        "morning": {
+            "enabled": True,
+            "rows": [
+                TableRowContent(
+                    # line_type=line_type(),
+                    line_type="default" if j == 0 else "arrow",
+                    start=product["delay"] if i == 0 else 0,
+                    end=5,
+                    restart=True,
+                    product=product if i == 0 else False,
+                ).get_context()
+                for j, product in enumerate(
+                    [
+                        create_mock_product_data(labels[v])
+                        for v in random.sample(
+                            range(0, len(labels)), random.randint(4, len(labels))
+                        )
+                    ]
+                )
+            ],
+            "row_count": 5,
+        },
+        "evening": {"enabled": False, "rows": [], "row_count": 5},
+        "time_col": i == 0,
+        "table_header": True,
+    }
+    for i in range(4)
+]
 
 weeks_1 = [
     {
@@ -68,53 +110,53 @@ weeks_2 = [
         "morning": {
             "enabled": True,
             "rows": [
-                TableRowContent(
-                    line_type="default",
-                    start=0,
-                    restart=False,
-                    product={
-                        "name": "Magnésium",
-                        "intake": "3x",
-                        "icon": "pill.svg",
-                    },
-                ).get_context(),
-                TableRowContent(
-                    line_type="default",
-                    start=1,
-                    restart=False,
-                    product={
-                        "name": "Magnésium",
-                        "intake": "3x",
-                        "icon": "pill.svg",
-                    },
-                ).get_context(),
-                TableRowContent(
-                    line_type="default",
-                    start=6,
-                    restart=False,
-                    product={
-                        "name": "Magnésium",
-                        "intake": "3x",
-                        "icon": "pill.svg",
-                    },
-                ).get_context(),
+                # TableRowContent(
+                #     line_type="default",
+                #     start=0,
+                #     restart=False,
+                #     product={
+                #         "name": "Magnésium",
+                #         "intake": "3x",
+                #         "icon": "pill.svg",
+                #     },
+                # ).get_context(),
+                # TableRowContent(
+                #     line_type="default",
+                #     start=1,
+                #     restart=False,
+                #     product={
+                #         "name": "Magnésium",
+                #         "intake": "3x",
+                #         "icon": "pill.svg",
+                #     },
+                # ).get_context(),
+                # TableRowContent(
+                #     line_type="default",
+                #     start=6,
+                #     restart=False,
+                #     product={
+                #         "name": "Magnésium",
+                #         "intake": "3x",
+                #         "icon": "pill.svg",
+                #     },
+                # ).get_context(),
             ],
             "row_count": 5,
         },
         "evening": {
             "enabled": True,
             "rows": [
-                TableRowContent(
-                    line_type="stop",
-                    start=0,
-                    end=4,
-                    restart=True,
-                ).get_context(),
-                TableRowContent(
-                    line_type="pause",
-                    start=1,
-                    restart=False,
-                ).get_context(),
+                # TableRowContent(
+                #     line_type="stop",
+                #     start=0,
+                #     end=4,
+                #     restart=True,
+                # ).get_context(),
+                # TableRowContent(
+                #     line_type="pause",
+                #     start=1,
+                #     restart=False,
+                # ).get_context(),
             ],
             "row_count": 5,
         },
@@ -172,8 +214,12 @@ assets_context = {
             "restart": "Reprendre",
         },
     },
-    "weeks": weeks_2,
-    "months": [{"weeks": weeks_2, "row_count": {"morning": 5, "evening": 5}}],
+    "weeks": empty_week,
+    "months": [
+        {
+            "weeks": empty_week,
+        }
+    ],
 }
 
 
