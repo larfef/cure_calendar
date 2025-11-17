@@ -80,7 +80,7 @@ class PosologyIntake(models.Model):
     def unit_icon(self):
         """Return SVG path for the intake unit"""
         UNIT_ICON = {
-            IntakeUnit.CAPSULE: "templates_app/images/capsule.svg",
+            IntakeUnit.CAPSULE: "templates_app/images/capsules.svg",
             IntakeUnit.DROP: "templates_app/images/drop.svg",
             IntakeUnit.ML: "templates_app/images/drop.svg",
             IntakeUnit.DOSETTE: "templates_app/images/dosette.svg",

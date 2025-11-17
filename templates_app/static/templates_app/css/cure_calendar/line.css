@@ -9,6 +9,8 @@
     min-height: 1px;
     background: #86BB89;
     align-self: center;
+    min-width: 0;
+    flex-grow: 1;
 }
 
 .line-red {

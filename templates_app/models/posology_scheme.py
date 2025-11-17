@@ -65,11 +65,38 @@ class PosologyScheme(models.Model):
 
     def get_total_daily_quantity(self):
         """Calculate total daily quantity"""
-        return sum(intake.daily_quantity for intake in self.intakes.all())
+        result = sum(intake.daily_quantity for intake in self.intakes.all())
+        if float(result).is_integer():
+            return int(result)
+        else:
+            return round(float(result), 1)
 
     @property
     def duration(self):
         return f"{self.duration_value} {DurationUnit(self.duration_unit).label}"
+
+    @property
+    def day_time(self):
+        """
+        Checks if all intakes for this scheme are at MORNING, or all at EVENING, or MIXED.
+        Returns:
+            "morning" if all intakes are set to morning,
+            "evening" if all are evening,
+            "mixed" otherwise (including if there are none).
+        """
+        times = list(self.intakes.values_list("time_of_day", flat=True))
+        if not times:
+            return "mixed"
+        unique_times = set(times)
+        if len(unique_times) == 1:
+            t = unique_times.pop()
+            from templates_app.models.posology_choices import TimeOfDay
+
+            if t == TimeOfDay.MORNING or t == TimeOfDay.ANYTIME:
+                return "morning"
+            elif t == TimeOfDay.EVENING:
+                return "evening"
+        return "mixed"
 
     def get_formatted_intake_quantity_unit(self):
         """

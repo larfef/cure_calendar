@@ -1,13 +1,14 @@
 from django.test import TestCase
 from templates_app.classes.posology_calculation_model import PosologyCalculationModel
-from templates_app.logging.log_randomized_sample_to_yaml import (
-    log_randomized_sample_to_yaml,
-)
-from templates_app.tests.posology.init_database import (
+from templates_app.logging.log_database_state_to_yaml import (
     log_database_state_to_yaml,
-    populate_database,
-    get_randomized_products_sample,
 )
+from templates_app.tests.posology.initial_state import (
+    populate_database,
+    create_mock_a5_product,
+    labels,
+)
+import random
 
 # === Dummy import to get Product methods with debugpy
 from templates_app.models.product import Product
@@ -18,13 +19,18 @@ class TestPosolgyCalculationModel(TestCase):
         populate_database()
         log_database_state_to_yaml()
 
-        self.a5_products = get_randomized_products_sample()
+        self.a5_products = [
+            create_mock_a5_product(labels[v])
+            for v in random.sample(
+                range(0, len(labels)), random.randint(4, len(labels))
+            )
+        ]
 
-        self.calculator = PosologyCalculationModel(self.a5_products)
+        self.calculator = PosologyCalculationModel(
+            self.a5_products, cortisol_phase=True
+        )
+
         pass
 
     def test_methods(self):
-        microbiote_phase_start = self.calculator.get_microbiote_phase_start()
-        microbiote_phase_end = self.calculator.get_microbiote_phase_end()
-
         pass

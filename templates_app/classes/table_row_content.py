@@ -44,6 +44,7 @@ class TableRowContent:
             "stop_style": self._get_stop_style(),
             "line_style": self._get_line_style(),
             "margin_left": self._get_margin_left(),
+            "padding_left": self._get_padding_left(),
         }
 
     def _calculate_end_modulo(self):
@@ -66,11 +67,16 @@ class TableRowContent:
     def _get_margin_left(self):
         return f"margin-left: calc({self.start} * calc(var(--cell-width) + 1px))"
 
+    def _get_padding_left(self):
+        return f"padding-left: calc({self.start} * calc(var(--cell-width) + 1px))"
+
     def _get_line_style(self):
         """Calculate inline style for the line itself"""
 
-        styles = [f"width: {self.width}"]
-        # styles = []
+        # styles = [f"width: {self.width}"]
+        styles = [
+            f"width: calc(var(--cell-width) * (7 - {self.start}) + 6px - {self.start}px)"
+        ]
 
         if not self.product:
             # Add margin-left for all types except pause (pause handles its own positioning)

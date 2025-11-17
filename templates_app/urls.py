@@ -4,8 +4,7 @@ from . import views
 app_name = "templates_app"
 
 urlpatterns = [
-    path("", views.calendar, name="calendar"),
     path("cure", views.cure, name="cure"),
-    path("assets", views.assets, name="assets"),
+    path("assets", views.test_calendar, name="test_calendar"),
     path("nested_admin/", include("nested_admin.urls")),
 ]

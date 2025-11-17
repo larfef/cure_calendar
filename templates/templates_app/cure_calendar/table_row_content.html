@@ -1,21 +1,27 @@
 {% load static %}
-<div class="line-container" style="position: absolute; width: 100%;">
+<div class="line-container"
+     style="position: absolute;
+            width: 100%;
+            {{ current.padding_left }}">
     {% if current.product %}
         {% include "templates_app/cure_calendar/intake.html" %}
     {% endif %}
-    {% if current.restart %}
+    {% if current.restart and not current.product %}
         <div class="line-container__restart" style="{{ current.restart_style }}">{{ text.line.restart }}</div>
     {% endif %}
     {% if current.type == 'default' %}
         <div class="line-green" style="{{ current.line_style }}"></div>
     {% elif current.type == 'arrow' %}
+        <div class="line-green"></div>
         <div style="display: flex;
                     position: absolute;
+                    right: 0;
                     align-self: center;
-                    width: 100%">
-            <div class="line-green" style="{{ current.line_style }}"></div>
+                    min-width: 0;
+                    overflow: hidden">
             <img width="4"
                  height="7"
+                 style="flex-shrink: 0"
                  src="/static/templates_app/images/green-arrow.png">
         </div>
     {% elif current.type == 'stop' %}

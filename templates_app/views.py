@@ -1,316 +1,102 @@
-import random
 from django.shortcuts import render
+from django.db import transaction
+from django.http import HttpResponse
+from templates_app.classes.posology_calculation_model import PosologyCalculationModel
 from templates_app.models.product import Product
 from templates_app.classes.table_row_content import TableRowContent
-from templates_app.tests.posology.init_database import (
-    create_mock_product_data,
-    labels,
-)
-
-# Edge case
-# Product overflow of week table for week 4 and 8 ==> It goes out of template size
 
 
-def line_type(n):
-    if n == 0:
-        return ""
+def test_calendar(request):
+    from templates_app.tests.posology.initial_state import (
+        populate_database,
+        create_mock_a5_product,
+        labels,
+    )
+    from templates_app.models.product import Product
+    import random
 
-
-empty_week = [
-    {
-        "morning": {
-            "enabled": True,
-            "rows": [
-                TableRowContent(
-                    # line_type=line_type(),
-                    line_type="default" if j == 0 else "arrow",
-                    start=product["delay"] if i == 0 else 0,
-                    end=5,
-                    restart=True,
-                    product=product if i == 0 else False,
-                ).get_context()
-                for j, product in enumerate(
-                    [
-                        create_mock_product_data(labels[v])
-                        for v in random.sample(
-                            range(0, len(labels)), random.randint(4, len(labels))
-                        )
-                    ]
+    try:
+        with transaction.atomic():
+            populate_database()
+            a5_products = [
+                create_mock_a5_product(labels[v])
+                for v in random.sample(
+                    range(0, len(labels)), random.randint(4, len(labels))
                 )
-            ],
-            "row_count": 5,
-        },
-        "evening": {"enabled": False, "rows": [], "row_count": 5},
-        "time_col": i == 0,
-        "table_header": True,
-    }
-    for i in range(4)
-]
+            ]
 
-weeks_1 = [
-    {
-        "morning": {
-            "enabled": True,
-            "rows": [
-                TableRowContent(
-                    line_type="default", start=6, restart=True
-                ).get_context(),
-            ],
-        },
-        "evening": {
-            "enabled": True,
-            "rows": [
-                TableRowContent(
-                    line_type="default",
-                    start=3,
-                    restart=False,
-                    product={
-                        "name": "Magnésium",
-                        "intake": "3x",
-                        "icon": "pill.svg",
+            calculator = PosologyCalculationModel(
+                a5_products, cortisol_phase=random.randint(0, 1)
+            )
+
+            # TableRowContent(
+            #     line_type="default" if i == 0 else "stop",
+            #     start=product["delay"] if i == 0 else 0,
+            #     end=5,
+            #     restart=False,
+            #     product=product if i == 0 else False,
+            # ).get_context()
+            # for product in calculator.products
+            # if product["posology_scheme"].first().day_time == "morning"
+
+            NB_DAY = 7
+
+            empty_week = [
+                {
+                    "morning": {
+                        "enabled": True,
+                        "rows": [],
                     },
-                ).get_context(),
-                TableRowContent(
-                    line_type="default", start=2, end=6, restart=False
-                ).get_context(),
-            ],
-        },
-        "time_col": True,
-        "table_header": True,
-    },
-    {
-        "morning": {
-            "enabled": True,
-            "rows": [
-                TableRowContent(
-                    line_type="stop", start=0, end=3, restart=False
-                ).get_context(),
-            ],
-        },
-        "evening": {
-            "enabled": True,
-            "rows": [
-                TableRowContent(
-                    line_type="arrow",
-                    start=0,
-                    restart=False,
-                ).get_context(),
-                TableRowContent(
-                    line_type="stop", start=0, end=6, restart=False
-                ).get_context(),
-            ],
-        },
-        "time_col": False,
-        "table_header": True,
-    },
-]
+                    "evening": {"enabled": True, "rows": []},
+                    "time_col": i == 0,
+                    "table_header": True,
+                }
+                for i in range(1)
+            ]
 
-weeks_2 = [
-    {
-        "morning": {
-            "enabled": True,
-            "rows": [
-                # TableRowContent(
-                #     line_type="default",
-                #     start=0,
-                #     restart=False,
-                #     product={
-                #         "name": "Magnésium",
-                #         "intake": "3x",
-                #         "icon": "pill.svg",
-                #     },
-                # ).get_context(),
-                # TableRowContent(
-                #     line_type="default",
-                #     start=1,
-                #     restart=False,
-                #     product={
-                #         "name": "Magnésium",
-                #         "intake": "3x",
-                #         "icon": "pill.svg",
-                #     },
-                # ).get_context(),
-                # TableRowContent(
-                #     line_type="default",
-                #     start=6,
-                #     restart=False,
-                #     product={
-                #         "name": "Magnésium",
-                #         "intake": "3x",
-                #         "icon": "pill.svg",
-                #     },
-                # ).get_context(),
-            ],
-            "row_count": 5,
-        },
-        "evening": {
-            "enabled": True,
-            "rows": [
-                # TableRowContent(
-                #     line_type="stop",
-                #     start=0,
-                #     end=4,
-                #     restart=True,
-                # ).get_context(),
-                # TableRowContent(
-                #     line_type="pause",
-                #     start=1,
-                #     restart=False,
-                # ).get_context(),
-            ],
-            "row_count": 5,
-        },
-        "time_col": True,
-        "table_header": True,
-    },
-    {
-        "morning": {
-            "enabled": True,
-            "rows": [
-                TableRowContent(
-                    line_type="stop",
-                    start=0,
-                    end=5,
-                    restart=False,
-                ).get_context(),
-                TableRowContent(
-                    line_type="arrow",
-                    start=0,
-                    restart=False,
-                ).get_context(),
-                TableRowContent(
-                    line_type="default",
-                    start=0,
-                    restart=False,
-                ).get_context(),
-            ],
-            "row_count": 5,
-        },
-        "evening": {
-            "enabled": True,
-            "rows": [
-                TableRowContent(
-                    line_type="default",
-                    start=2,
-                    restart=True,
-                ).get_context(),
-            ],
-            "row_count": 5,
-        },
-        "time_col": False,
-        "table_header": True,
-    },
-]
+            for product in calculator.products:
+                if product["delay"] < NB_DAY:
+                    day_time = product["posology_scheme"].day_time
+                    content = TableRowContent(
+                        line_type="default", start=product["delay"], product=product
+                    ).get_context()
+                    empty_week[0][day_time]["rows"].append(content)
 
+            empty_week[0]["morning"]["row_count"] = len(
+                empty_week[0]["morning"]["rows"]
+            )
+            empty_week[0]["evening"]["row_count"] = len(
+                empty_week[0]["evening"]["rows"]
+            )
 
-assets_context = {
-    "text": {
-        "header": {
-            "1": "Calendrier Symp",
-        },
-        "table": {"header": ["L", "M", "M", "J", "V", "S", "D"]},
-        "line": {
-            "stop": "Arrêter",
-            "restart": "Reprendre",
-        },
-    },
-    "weeks": empty_week,
-    "months": [
-        {
-            "weeks": empty_week,
-        }
-    ],
-}
-
-
-def calendar(request):
-    """Calendar view for supplement cure schedule"""
-
-    text = {
-        "header": {
-            "1": "Calendrier Symp",
-        },
-        "table": {"header": ["L", "M", "M", "J", "V", "S", "D"]},
-        "phases": {
-            "1": {"title": "Phase 1", "start": "Jour 1", "end": "Jour 9"},
-            "2": {"title": "Phase 2", "start": "Jour 10", "end": "Jour X"},
-            "subtitle": "Cochez chaque semaine terminée",
-            "start": "Date début de la cure : ...................................",
-            "changes": [
-                {"stop": "Arrêter"},
-                {"continue": "Continuer"},
-                {"add": "Ajouter"},
-            ],
-        },
-    }
-
-    a5 = {
-        "apply_phases": True,
-        # "products": Product.objects.all(),
-        "products": [
-            {
-                "phase": 1,
-                "nutrients": [
-                    {"label": "Vitamine D3"},
-                    {"label": "Magnésium"},
+            context = {
+                "text": {
+                    "header": {
+                        "1": "Calendrier Symp",
+                    },
+                    "table": {"header": ["L", "M", "M", "J", "V", "S", "D"]},
+                    "line": {
+                        "stop": "Arrêter",
+                        "restart": "Reprendre",
+                    },
+                },
+                "weeks": empty_week,
+                "months": [
+                    {
+                        "weeks": empty_week,
+                    }
                 ],
-                "delay": 0,
-                "posology": "2 gélules le matin",
-                "duration": "30 jours",
-                "label": "Complexe Vitamine D + Magnésium",
-            },
-            {
-                "phase": 2,
-                "nutrients": [
-                    {"label": "Oméga 3"},
-                ],
-                "delay": 5,
-                "posology": "1 gélule au repas",
-                "duration": "60 jours",
-                "label": "Oméga 3 Premium",
-            },
-            {
-                "phase": 2,
-                "nutrients": [
-                    {"label": "Probiotiques"},
-                    {"label": "Zinc"},
-                ],
-                "delay": 0,
-                "posology": "1 gélule le soir",
-                "duration": "30 jours",
-                "label": "Probio + Zinc",
-            },
-            {
-                "phase": 2,
-                "nutrients": [
-                    {"label": "Probiotiques"},
-                    {"label": "Zinc"},
-                ],
-                "delay": 0,
-                "posology": "1 gélule le soir",
-                "duration": "30 jours",
-                "label": "Probio + Zinc",
-            },
-        ],
-    }
+            }
 
-    cure = {
-        "phases": {
-            "applicability": a5["apply_phases"],
-        },
-        "products": sorted(a5["products"], key=lambda p: p["phase"]),
-    }
+            response = render(
+                request, "templates_app/cure_calendar/assets.html", context
+            )
+            transaction.set_rollback(True)
+            return response
 
-    context = {
-        "title": "Calendrier de votre cure Symp",
-        "text": text,
-        "cure": cure,
-    }
-    return render(request, "templates_app/cure_calendar/base.html", context)
-
-
-def assets(request):
-    return render(request, "templates_app/cure_calendar/assets.html", assets_context)
+    except Exception as e:
+        # If something goes wrong, transaction automatically rolls back
+        return HttpResponse(f"Error in test view: {str(e)}", status=500)
 
 
 def cure(request):

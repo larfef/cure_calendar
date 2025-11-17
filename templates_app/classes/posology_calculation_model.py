@@ -20,20 +20,19 @@ def adapter_a5_product(products: List[A5Product]) -> List[AdaptedA5Product]:
         )
     }
 
-    new_products: Dict[AdaptedA5Product] = {}
+    new_products: List[AdaptedA5Product] = []
     for product in products:
         adapted_product = product_lookup.get(product["label"])
 
         if adapted_product:
-            new_products.update(
+            new_products.append(
                 {
-                    product["label"]: {
-                        "nutrients": product.get("nutrients"),
-                        "posology": adapted_product.posology_schemes.all(),  # QuerySet
-                        "servings": adapted_product.servings,
-                        "delay": product["delay"],
-                        "phase": product["phase"],
-                    }
+                    "label": product["label"],
+                    "nutrients": product.get("nutrients"),
+                    "posology": adapted_product.posology_schemes.all(),  # QuerySet
+                    "servings": adapted_product.servings,
+                    "delay": product["delay"],
+                    "phase": product["phase"],
                 }
             )
 
@@ -50,6 +49,7 @@ class PosologyCalculationModel:
     def __init__(
         self,
         products: Union[List[A5Product], List[AdaptedA5Product]],
+        cortisol_phase: bool = False,
         cortisol_phase_duration: int = CORTISOL_PHASE_DURATION_DAYS,
         adapted: bool = False,
     ):
@@ -62,37 +62,37 @@ class PosologyCalculationModel:
         else:
             raw_products = products
 
-        # Validate and normalize all products upfront
+        self.cortisol_phase_duration = cortisol_phase_duration * cortisol_phase
+        # Validate and normalize products
         self.products = self._validate_and_normalize_products(raw_products)
-        self.cortisol_phase_duration = cortisol_phase_duration
 
     def _validate_and_normalize_products(self, products: Dict) -> Dict:
         """Validate and normalize product data"""
-        normalized = {}
+        normalized = []
 
-        for label, product in products.items():
+        for product in products:
             # Validate required fields
             if "delay" not in product:
-                raise ProductValidationError(f"Product '{label}' missing 'delay' field")
+                raise ProductValidationError(
+                    f"Product '{product['label']}' missing 'delay' field"
+                )
 
             if "servings" not in product:
                 raise ProductValidationError(
-                    f"Product '{label}' missing or invalid 'servings'"
+                    f"Product '{product['label']}' missing or invalid 'servings'"
                 )
 
             if product["servings"] <= 0:
                 raise ProductValidationError(
-                    f"Product '{label}' has invalid servings : {product['servings']}"
+                    f"Product '{product['label']}' has invalid servings : {product['label']}"
                 )
 
             # Validate and extract posology scheme
-            posology_qs = product.get("posology")
-            if not posology_qs or not posology_qs.exists():
+            posology_scheme = product.get("posology").first()
+            if not posology_scheme:
                 raise ProductValidationError(
-                    f"Product '{label}' has no posology schemes"
+                    f"Product '{product['label']}' has no posology schemes"
                 )
-
-            posology_scheme = posology_qs.first()
 
             # Validate duration
             if (
@@ -100,28 +100,35 @@ class PosologyCalculationModel:
                 or posology_scheme.duration_value <= 0
             ):
                 raise ProductValidationError(
-                    f"Product '{label}' has invalid duration: {posology_scheme.duration_value}"
+                    f"Product '{product['label']}' has invalid duration: {posology_scheme.duration_value}"
                 )
 
             # Validate total daily quantity
             total_daily_quantity = posology_scheme.get_total_daily_quantity()
             if not total_daily_quantity or total_daily_quantity <= 0:
                 raise ProductValidationError(
-                    f"Product '{label}' has invalid total daily quantity: {total_daily_quantity}"
+                    f"Product '{product['label']}' has invalid total daily quantity: {total_daily_quantity}"
                 )
 
-            total_daily_intakes_per_unit = product["servings"] / total_daily_quantity
+            total_daily_intakes_per_unit = int(
+                product["servings"] / total_daily_quantity
+            )
 
             # Store normalized product with pre-computed values
-            normalized[label] = {
-                "delay": product["delay"],
-                "nutrients": product.get("nutrients"),
-                "phase": product.get("phase"),
-                "posology_scheme": posology_scheme,
-                "servings": product["servings"],
-                "total_daily_quantity": total_daily_quantity,
-                "total_daily_intakes_per_unit": total_daily_intakes_per_unit,
-            }
+            normalized.append(
+                {
+                    "label": product["label"],
+                    "delay": product["delay"]
+                    + self.cortisol_phase_duration * (product["phase"] == 2),
+                    "nutrients": product.get("nutrients"),
+                    "phase": product["phase"],
+                    "posology_scheme": posology_scheme,
+                    "servings": product["servings"],
+                    "unit_icon": posology_scheme.intakes.first().unit_icon,
+                    "total_daily_quantity": total_daily_quantity,
+                    "total_daily_intakes_per_unit": total_daily_intakes_per_unit,
+                }
+            )
 
         return normalized
 
