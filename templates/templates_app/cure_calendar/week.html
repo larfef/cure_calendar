@@ -13,7 +13,7 @@
         {% if week.morning.enabled %}
             <div>
                 {% with content=week.morning.rows table_header=week.table_header %}
-                    {% include "templates_app/cure_calendar/table.html" with rows=week.morning.row_count %}
+                    {% include "templates_app/cure_calendar/table.html" with rows=month.morning.num_line %}
                 {% endwith %}
             </div>
         {% endif %}
@@ -33,11 +33,11 @@
                 {% with rows=week.evening.rows %}
                     {% if not week.morning.enabled %}
                         {% with table_header=True content=week.evening.rows %}
-                            {% include "templates_app/cure_calendar/table.html" with rows=week.morning.row_count %}
+                            {% include "templates_app/cure_calendar/table.html" with rows=month.evening.num_line %}
                         {% endwith %}
                     {% else %}
                         {% with content=week.evening.rows %}
-                            {% include "templates_app/cure_calendar/table.html" with rows=week.morning.row_count %}
+                            {% include "templates_app/cure_calendar/table.html" with rows=month.evening.num_line %}
                         {% endwith %}
                     {% endif %}
                 {% endwith %}

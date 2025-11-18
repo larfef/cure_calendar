@@ -36,7 +36,9 @@ def populate_database():
     for label in labels:
         product = Product.objects.create(label=label, servings=random.randint(30, 120))
         scheme = PosologyScheme.objects.create(
-            product=product, duration_value=random.randint(15, 90)
+            product=product,
+            # duration_value=random.randint(15, 30)
+            duration_value=25,
         )
         PosologyIntake.objects.create(
             scheme=scheme,
@@ -51,8 +53,9 @@ def populate_database():
 def create_mock_a5_product(label: str):
     return {
         "label": label,
-        "delay": random.randint(0, 5),
-        "phase": random.randint(1, 2),
+        "delay": random.randint(0, 7),
+        # "phase": random.randint(1, 2),
+        "phase": 1,
     }
 
 

@@ -56,15 +56,19 @@
         </style>
     </head>
     <body>
-        {% for month in months %}
-            {% for week in month.weeks %}
-                <div class="week-outer-wrapper"
-                     style="margin-right: {% if forloop.counter == 1 or forloop.counter == 3 %}7px{% elif forloop.counter == 2 %}31px{% endif %};
-                            position: relative;
-                            z-index: {{ forloop.revcounter }}">
-                    {% include "templates_app/cure_calendar/week.html" with rows=5 %}
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            {% for month in months %}
+                <div style="display: flex;">
+                    {% for week in month.weeks %}
+                        <div class="week-outer-wrapper"
+                             style="margin-right: {% if forloop.counter == 1 or forloop.counter == 3 %}7px{% elif forloop.counter == 2 %}31px{% endif %};
+                                    position: relative;
+                                    z-index: {{ forloop.revcounter }}">
+                            {% include "templates_app/cure_calendar/week.html" with month=month %}
+                        </div>
+                    {% endfor %}
                 </div>
             {% endfor %}
-        {% endfor %}
+        </div>
     </body>
 </html>

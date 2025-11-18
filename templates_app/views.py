@@ -1,9 +1,11 @@
+from calendar import c
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
 from templates_app.classes.posology_calculation_model import PosologyCalculationModel
 from templates_app.models.product import Product
 from templates_app.classes.table_row_content import TableRowContent
+import copy
 
 
 def test_calendar(request):
@@ -19,55 +21,88 @@ def test_calendar(request):
         with transaction.atomic():
             populate_database()
             a5_products = [
-                create_mock_a5_product(labels[v])
-                for v in random.sample(
-                    range(0, len(labels)), random.randint(4, len(labels))
-                )
+                # create_mock_a5_product(labels[v])
+                # for v in random.sample(
+                #     range(0, len(labels)), random.randint(4, len(labels))
+                # )
+                create_mock_a5_product(labels[0])
             ]
 
             calculator = PosologyCalculationModel(
                 a5_products, cortisol_phase=random.randint(0, 1)
             )
 
-            # TableRowContent(
-            #     line_type="default" if i == 0 else "stop",
-            #     start=product["delay"] if i == 0 else 0,
-            #     end=5,
-            #     restart=False,
-            #     product=product if i == 0 else False,
-            # ).get_context()
-            # for product in calculator.products
-            # if product["posology_scheme"].first().day_time == "morning"
+            import math
 
-            NB_DAY = 7
+            months = []
 
-            empty_week = [
-                {
-                    "morning": {
-                        "enabled": True,
-                        "rows": [],
-                    },
-                    "evening": {"enabled": True, "rows": []},
-                    "time_col": i == 0,
-                    "table_header": True,
-                }
-                for i in range(1)
-            ]
+            empty_week = {
+                "morning": {
+                    "enabled": True,
+                    "rows": [],
+                },
+                "evening": {"enabled": True, "rows": []},
+                "time_col": False,
+                "table_header": False,
+            }
 
-            for product in calculator.products:
-                if product["delay"] < NB_DAY:
+            tot_weeks = math.ceil(calculator.get_microbiote_phase_end() / 7)
+            for week_index in range(tot_weeks):
+                current_month = week_index // 4
+                current_week = week_index % 4
+
+                # Ensure the month dict exists
+                if current_month >= len(months):
+                    months.append(
+                        {
+                            "weeks": [],
+                            "evening": {"num_line": 0},
+                            "morning": {"num_line": 0},
+                        }
+                    )
+
+                week = copy.deepcopy(empty_week)
+                week["time_col"] = current_week == 0
+                week["table_header"] = current_month == 0
+                months[current_month]["weeks"].append(week)
+
+                for product in calculator.products:
                     day_time = product["posology_scheme"].day_time
-                    content = TableRowContent(
-                        line_type="default", start=product["delay"], product=product
-                    ).get_context()
-                    empty_week[0][day_time]["rows"].append(content)
+                    if (
+                        product["delay"] < (week_index + 1) * 7
+                        and product["delay"] >= week_index * 7
+                    ):
+                        content = TableRowContent(
+                            line_type="default",
+                            start=product["delay"] - week_index * 7
+                            if product["delay"] > 28 or product["delay"] < 22
+                            else 0,
+                            product=product,
+                        ).get_context()
+                        week[day_time]["rows"].append(content)
+                    elif (
+                        product["posology_scheme"].duration_value > (week_index + 1) * 7
+                        and product["delay"] < (week_index) * 7
+                    ):
+                        content = TableRowContent(
+                            line_type="default",
+                            start=0,
+                        ).get_context()
+                        week[day_time]["rows"].append(content)
+                    else:
+                        content = TableRowContent(
+                            line_type="stop", start=0, end=5, stop=True
+                        ).get_context()
+                        week[day_time]["rows"].append(content)
 
-            empty_week[0]["morning"]["row_count"] = len(
-                empty_week[0]["morning"]["rows"]
-            )
-            empty_week[0]["evening"]["row_count"] = len(
-                empty_week[0]["evening"]["rows"]
-            )
+                week["morning"]["row_count"] = len(week["morning"]["rows"])
+                week["evening"]["row_count"] = len(week["evening"]["rows"])
+                months[current_month]["evening"]["num_line"] = max(
+                    len(w["evening"]["rows"]) for w in months[current_month]["weeks"]
+                )
+                months[current_month]["morning"]["num_line"] = max(
+                    len(w["morning"]["rows"]) for w in months[current_month]["weeks"]
+                )
 
             context = {
                 "text": {
@@ -80,12 +115,7 @@ def test_calendar(request):
                         "restart": "Reprendre",
                     },
                 },
-                "weeks": empty_week,
-                "months": [
-                    {
-                        "weeks": empty_week,
-                    }
-                ],
+                "months": months,
             }
 
             response = render(

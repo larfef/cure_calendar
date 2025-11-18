@@ -129,25 +129,28 @@ class PosologyCalculationModel:
                     "total_daily_intakes_per_unit": total_daily_intakes_per_unit,
                 }
             )
+            normalized.sort(key=lambda p: p["delay"])
 
         return normalized
 
     def get_microbiote_phase_start(self):
-        return (
-            self.cortisol_phase_duration
-            + min(self.products.values(), key=lambda p: p["delay"])["delay"]
-        )
+        if self.cortisol_phase_duration > 0:
+            # If there's a cortisol phase, find min delay among phase 2 products
+            return min(
+                (p for p in self.products if p["phase"] == 2),
+                key=lambda p: p["delay"],
+                default=min(self.products, key=lambda p: p["delay"]),
+            )["delay"]
+        else:
+            # No cortisol phase, find min delay among all products
+            return min(self.products, key=lambda p: p["delay"])["delay"]
 
     def get_microbiote_phase_end(self):
         max_product = max(
-            self.products.values(),
+            self.products,
             key=lambda p: p["delay"] + p["posology_scheme"].duration_value,
         )
-        return (
-            self.cortisol_phase_duration
-            + max_product["delay"]
-            + max_product["posology_scheme"].duration_value
-        )
+        return max_product["delay"] + max_product["posology_scheme"].duration_value
 
     def get_total_daily_intakes_per_product_unit(self, product):
         return product["servings"] / product["total_daily_quantity"]
