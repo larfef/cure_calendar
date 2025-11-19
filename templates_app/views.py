@@ -1,4 +1,3 @@
-from calendar import c
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
@@ -6,36 +5,117 @@ from templates_app.classes.posology_calculation_model import PosologyCalculation
 from templates_app.models.product import Product
 from templates_app.classes.table_row_content import TableRowContent
 import copy
+import math
+from templates_app.models.product import Product
+import random
+from templates_app.tests.posology.initial_state import (
+    populate_database,
+    create_mock_a5_product,
+    labels,
+)
+from templates_app.utils.pdf_generator import generate_pdf_from_url
+
+NB_DAY = 7
+
+MONTH_DAY = 4 * NB_DAY
+
+
+def set_table_lines_for_month(month):
+    arr = ["morning", "evening"]
+
+    for v in arr:
+        month[v]["num_line"] = max(len(w[v]["rows"]) for w in month["weeks"])
+
+
+def compute_week_content(product, week, week_index):
+    # Check if content will be render in evening or
+    # in morning row
+    day_time = product["posology_scheme"].day_time
+
+    # Get posology scheme duration with product delay
+    posology_end = product["posology_scheme"].duration_value + product["delay"]
+
+    current_week_start = week_index * NB_DAY
+    current_week_end = (week_index + 1) * NB_DAY
+    if product["delay"] < current_week_end and product["delay"] >= current_week_start:
+        content = TableRowContent(
+            line_type="default" if week_index % 4 != 3 else "arrow",
+            start=product["delay"] - current_week_start
+            # Use delay to offset the product in the week table only
+            # when the product does not start in the last week of the month.
+            # Otherwise, some product displays overflow from
+            # the A4 dimensions.
+            if product["delay"] > 28 or product["delay"] < 22
+            else 0,
+            product=product,
+        ).get_context()
+        week[day_time]["rows"].append(content)
+    elif (
+        product["posology_scheme"].duration_value + product["delay"] > current_week_end
+        and product["delay"] < current_week_start
+    ):
+        content = TableRowContent(
+            line_type="default" if week_index % 4 != 3 else "arrow",
+            start=0,
+            product_label=product["label"] if not week_index % 4 else False,
+        ).get_context()
+        week[day_time]["rows"].append(content)
+    elif posology_end <= current_week_end and posology_end > current_week_start:
+        content = TableRowContent(
+            line_type="stop",
+            start=0,
+            end=7 - (current_week_end - posology_end),
+            stop=True,
+        ).get_context()
+        week[day_time]["rows"].append(content)
+    elif (current_week_end // (MONTH_DAY + 1)) == (posology_end // (MONTH_DAY + 1)):
+        week[day_time]["rows"].append("")
+    elif product["delay"] > current_week_end:
+        week[day_time]["rows"].append("")
 
 
 def test_calendar(request):
-    from templates_app.tests.posology.initial_state import (
-        populate_database,
-        create_mock_a5_product,
-        labels,
-    )
-    from templates_app.models.product import Product
-    import random
-
     try:
         with transaction.atomic():
+            # Initial db state
             populate_database()
+
+            # Create mock products
             a5_products = [
-                # create_mock_a5_product(labels[v])
+                create_mock_a5_product(labels[v])
                 # for v in random.sample(
                 #     range(0, len(labels)), random.randint(4, len(labels))
                 # )
-                create_mock_a5_product(labels[0])
+                for v in random.sample(range(0, len(labels)), 4)
+                # create_mock_a5_product(labels[0])
             ]
 
+            # a5_products = [
+            #     {
+            #         "label": labels[0],
+            #         # "delay": 0,
+            #         "delay": 0,
+            #         # "phase": random.randint(1, 2),
+            #         "phase": 1,
+            #     },
+            #     {
+            #         "label": labels[1],
+            #         # "delay": 0,
+            #         "delay": 2,
+            #         # "phase": random.randint(1, 2),
+            #         "phase": 1,
+            #     },
+            # ]
+
+            # Compute states common to products
             calculator = PosologyCalculationModel(
                 a5_products, cortisol_phase=random.randint(0, 1)
             )
 
-            import math
-
+            # Initialize months array
             months = []
 
+            # Initialize empty week template dict
             empty_week = {
                 "morning": {
                     "enabled": True,
@@ -47,8 +127,13 @@ def test_calendar(request):
             }
 
             tot_weeks = math.ceil(calculator.get_microbiote_phase_end() / 7)
+
+            # Iterate through all weeks
             for week_index in range(tot_weeks):
+                # Get current month [0, n_month]
                 current_month = week_index // 4
+
+                # Get current week [0, 4)
                 current_week = week_index % 4
 
                 # Ensure the month dict exists
@@ -61,48 +146,32 @@ def test_calendar(request):
                         }
                     )
 
+                # Copy template
                 week = copy.deepcopy(empty_week)
+
+                # Set time column and table header
                 week["time_col"] = current_week == 0
                 week["table_header"] = current_month == 0
+
+                # Append week to current month
                 months[current_month]["weeks"].append(week)
 
+                # Compute week table content
                 for product in calculator.products:
-                    day_time = product["posology_scheme"].day_time
-                    if (
-                        product["delay"] < (week_index + 1) * 7
-                        and product["delay"] >= week_index * 7
-                    ):
-                        content = TableRowContent(
-                            line_type="default",
-                            start=product["delay"] - week_index * 7
-                            if product["delay"] > 28 or product["delay"] < 22
-                            else 0,
-                            product=product,
-                        ).get_context()
-                        week[day_time]["rows"].append(content)
-                    elif (
-                        product["posology_scheme"].duration_value > (week_index + 1) * 7
-                        and product["delay"] < (week_index) * 7
-                    ):
-                        content = TableRowContent(
-                            line_type="default",
-                            start=0,
-                        ).get_context()
-                        week[day_time]["rows"].append(content)
-                    else:
-                        content = TableRowContent(
-                            line_type="stop", start=0, end=5, stop=True
-                        ).get_context()
-                        week[day_time]["rows"].append(content)
+                    compute_week_content(product, week, week_index)
 
-                week["morning"]["row_count"] = len(week["morning"]["rows"])
-                week["evening"]["row_count"] = len(week["evening"]["rows"])
-                months[current_month]["evening"]["num_line"] = max(
-                    len(w["evening"]["rows"]) for w in months[current_month]["weeks"]
+                set_table_lines_for_month(months[current_month])
+
+                # Enabled each day time if there is
+                # at least one product intake time
+                # in it for the current month
+                week["evening"]["enabled"] = (
+                    months[current_month]["evening"]["num_line"] != 0
                 )
-                months[current_month]["morning"]["num_line"] = max(
-                    len(w["morning"]["rows"]) for w in months[current_month]["weeks"]
+                week["morning"]["enabled"] = (
+                    months[current_month]["morning"]["num_line"] != 0
                 )
+                pass
 
             context = {
                 "text": {
@@ -127,6 +196,22 @@ def test_calendar(request):
     except Exception as e:
         # If something goes wrong, transaction automatically rolls back
         return HttpResponse(f"Error in test view: {str(e)}", status=500)
+
+
+def download_calendar_pdf(request):
+    """Generate and display PDF of the cure calendar in browser"""
+    calendar_url = request.build_absolute_uri("/assets")
+
+    try:
+        pdf_bytes = generate_pdf_from_url(calendar_url)
+
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        response["Content-Disposition"] = (
+            'inline; filename="cure_calendar.pdf"'  # Changed to 'inline'
+        )
+        return response
+    except Exception as e:
+        return HttpResponse(f"Error generating PDF: {str(e)}", status=500)
 
 
 def cure(request):

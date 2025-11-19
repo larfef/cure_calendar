@@ -10,7 +10,7 @@
         </div>
     {% endif %}
     {% for row in "0"|center:rows %}
-        <div class="table-content__line {% if forloop.first %}table-content__line--first{% endif %}">
+        <div class="table-content__line {% if forloop.first and table_header == False %}table-content__line--first{% endif %}">
             {% if forloop.counter0 < content|length %}
                 {% with current=content|index:forloop.counter0 %}
                     {% include "templates_app/cure_calendar/table_row_content.html" %}

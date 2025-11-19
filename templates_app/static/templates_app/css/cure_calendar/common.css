@@ -14,5 +14,9 @@
     --line-xs: 9px;
     --line-m: 22px;
     --font-s: 12px;
-    --cell-width: 24px;
+
+    /* Use this to control element dimension */
+    --cell-width: 24pt;
+    --cell-height: 25pt;
+    --table-header-height: 12pt;
 }

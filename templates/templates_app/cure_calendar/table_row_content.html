@@ -10,6 +10,7 @@
         <div class="line-container__restart" style="{{ current.restart_style }}">{{ text.line.restart }}</div>
     {% endif %}
     {% if current.type == 'default' %}
+        {% if current.product_label %}<div class="line-container__label">{{ current.product_label }}</div>{% endif %}
         <div class="line-green" style="{{ current.line_style }}"></div>
     {% elif current.type == 'arrow' %}
         <div class="line-green"></div>

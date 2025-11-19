@@ -9,6 +9,7 @@ class TableRowContent:
         width=None,
         restart=False,
         product=False,
+        product_label=False,
         stop=False,
     ):
         """
@@ -23,6 +24,7 @@ class TableRowContent:
         self.type = line_type
         self.start = start
         self.product = product
+        self.product_label = product_label
         self.end = end
         self.width = width or "100%"
         self.restart = restart and self.type != "stop"
@@ -34,6 +36,7 @@ class TableRowContent:
             "type": self.type,
             "restart": self.restart,
             "product": self.product,
+            "product_label": self.product_label,
             "stop": self.stop,
             "width": self.width,
             "start": self.start,

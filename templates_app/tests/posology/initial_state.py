@@ -37,8 +37,8 @@ def populate_database():
         product = Product.objects.create(label=label, servings=random.randint(30, 120))
         scheme = PosologyScheme.objects.create(
             product=product,
-            # duration_value=random.randint(15, 30)
-            duration_value=25,
+            duration_value=random.randint(40, 60),
+            # duration_value=21,
         )
         PosologyIntake.objects.create(
             scheme=scheme,
@@ -53,32 +53,8 @@ def populate_database():
 def create_mock_a5_product(label: str):
     return {
         "label": label,
-        "delay": random.randint(0, 7),
+        # "delay": 0,
+        "delay": random.randint(0, 14),
         # "phase": random.randint(1, 2),
         "phase": 1,
     }
-
-
-# def create_mock_product_data(label: str) -> Dict[str, Any]:
-#     """Create a mock product with scheme and intake data without database"""
-
-#     return {
-#         "label": label,
-#         "servings": random.randint(30, 120),
-#         "delay": random.randint(0, 5),  # if random.randint(0, 1) else 0
-#         "phase": random.randint(1, 2),
-#         "icon": "pill.svg",
-#         "posology": {
-#             "duration_value": random.randint(15, 90),
-#             "duration_unit": "DAYS",
-#             "order": 1,
-#             "is_active": True,
-#             "intake": {
-#                 "quantity": random.randint(1, 4),
-#                 "frequency": random.randint(1, 3),
-#                 "intake_unit": "CAPSULE",
-#                 "time_of_day": "ANYTIME",
-#                 "intake_condition": "NO_CONDITION",
-#             },
-#         },
-#     }

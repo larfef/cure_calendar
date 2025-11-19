@@ -12,7 +12,7 @@
 }
 
 .week-content__left-corner {
-    height: 13px;
+    height: calc(var(--table-header-height));
     flex-shrink: 0;
     background: var(--neutral-gray-50, #FAFAFA);
     border-top: 1px solid var(--neutral-gray-300, #D1D9D8);
@@ -29,7 +29,7 @@
 }
 
 .week-content__icon-container {
-    width: 27.5px;
+    width: calc(var(--cell-width) + 1pt);
     height: 100%;
     display: flex;
     align-items: center;
@@ -37,13 +37,13 @@
 }
 
 .week-content__icon-morning-size {
-    width: 15px;
-    height: 15px;
+    width: 15pt;
+    height: 15pt;
 }
 
 .week-content__icon-evening-size {
-    width: 10px;
-    height: 10px;
+    width: 10pt;
+    height: 10pt;
 }
 
 .week-col__time{

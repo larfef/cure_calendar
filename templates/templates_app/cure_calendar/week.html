@@ -32,11 +32,11 @@
             <div>
                 {% with rows=week.evening.rows %}
                     {% if not week.morning.enabled %}
-                        {% with table_header=True content=week.evening.rows %}
+                        {% with table_header=week.table_header content=week.evening.rows %}
                             {% include "templates_app/cure_calendar/table.html" with rows=month.evening.num_line %}
                         {% endwith %}
                     {% else %}
-                        {% with content=week.evening.rows %}
+                        {% with content=week.evening.rows table_header=False %}
                             {% include "templates_app/cure_calendar/table.html" with rows=month.evening.num_line %}
                         {% endwith %}
                     {% endif %}
