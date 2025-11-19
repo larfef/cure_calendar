@@ -183,8 +183,56 @@ def test_calendar(request):
                         "stop": "Arrêter",
                         "restart": "Reprendre",
                     },
+                    "legend": {"title": "Légende", "unit_title": "Prise"},
                 },
                 "months": months,
+                # "legend": {
+                # {
+                #     "unit_icon": p["intake"].unit_icon,
+                #     "unit_label": p["intake"].unit_label,
+                #     "time": {
+                #         "icon": {
+                #             "src": p["intake"].time_of_day_icon,
+                #         },
+                #         "label": p["intake"].time_of_day_label,
+                #         "bg_color": p["intake"].time_of_day_color,
+                #     },
+                # }
+                # for i, p in enumerate(calculator.products)
+                # if not any(
+                #     p["intake"].unit_icon == prev["intake"].unit_icon
+                #     and p["intake"].unit_label == prev["intake"].unit_label
+                #     and p["intake"].time_of_day == prev["intake"].time_of_day
+                #     for prev in calculator.products[:i]
+                # )
+                "legend": {
+                    "unit": [
+                        {
+                            "icon": p["intake"].unit_icon,
+                            "label": p["intake"].unit_label,
+                        }
+                        for i, p in enumerate(calculator.products)
+                        if not any(
+                            p["intake"].unit_icon == prev["intake"].unit_icon
+                            and p["intake"].unit_label == prev["intake"].unit_label
+                            for prev in calculator.products[:i]
+                        )
+                    ],
+                    "time": [
+                        {
+                            "icon": {
+                                "src": p["intake"].time_of_day_icon,
+                            },
+                            "label": p["intake"].time_of_day_label,
+                            "bg_color": p["intake"].time_of_day_color,
+                        }
+                        for i, p in enumerate(calculator.products)
+                        if not any(
+                            p["intake"].time_of_day == prev["intake"].time_of_day
+                            for prev in calculator.products[:i]
+                        )
+                    ],
+                },
             }
 
             response = render(

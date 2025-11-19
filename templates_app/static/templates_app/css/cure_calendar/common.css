@@ -2,6 +2,9 @@
     --primary-green-100: #DBEEDD;
     --primary-green-400: #86BB89;
     --primary-green-500: #70AD71;
+    --primary-yellow: #FEFDF3;
+    --primary-blue: #EFFAFF;
+    --secondary-green: #EFFFF4;
     --secondary-900: #1E2D1E;
     --text-white: #FAFAFA;
     --background-color: #FEF1F1;
@@ -19,4 +22,5 @@
     --cell-width: 24pt;
     --cell-height: 25pt;
     --table-header-height: 12pt;
+
 }

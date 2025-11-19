@@ -124,7 +124,7 @@ class PosologyCalculationModel:
                     "phase": product["phase"],
                     "posology_scheme": posology_scheme,
                     "servings": product["servings"],
-                    "unit_icon": posology_scheme.intakes.first().unit_icon,
+                    "intake": posology_scheme.intakes.first(),
                     "total_daily_quantity": total_daily_quantity,
                     "total_daily_intakes_per_unit": total_daily_intakes_per_unit,
                 }

@@ -20,14 +20,14 @@ class IntakeCondition(models.TextChoices):
 class IntakeUnit(models.TextChoices):
     """Unit types for dosage"""
 
-    CAPSULE = "CAPSULE", "Gélule(s)"
-    TABLET = "TABLET", "Comprimé(s)"
+    CAPSULE = "CAPSULE", "Gélule"
+    TABLET = "TABLET", "Comprimé"
     ML = "ML", "ml"
-    DROP = "DROP", "Goutte(s)"
-    DOSE = "DOSE", "Dose(s)"
-    DOSETTE = "DOSETTE", "Dosette(s)"
-    SACHET = "SACHET", "Sachet(s)"
-    SPRAY = "SPRAY", "Spray(s)"
+    DROP = "DROP", "Goutte"
+    DOSE = "DOSE", "Dose"
+    DOSETTE = "DOSETTE", "Dosette"
+    SACHET = "SACHET", "Sachet"
+    SPRAY = "SPRAY", "Spray"
 
 
 class TimeOfDay(models.TextChoices):
@@ -35,4 +35,5 @@ class TimeOfDay(models.TextChoices):
 
     MORNING = "MORNING", "Matin"
     EVENING = "EVENING", "Soir"
+    MIXED = "MIXED", "Matin et soir"
     ANYTIME = "ANYTIME", "N'importe quand"

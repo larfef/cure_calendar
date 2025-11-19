@@ -3,7 +3,7 @@
     <div class="product-label">{{ current.product.label }}</div>
     <div class="intake-container">
         <div class="intake-text">{{ current.product.total_daily_quantity }}x&nbsp;</div>
-        <img src="{% static '' %}{{ current.product.unit_icon }}"
+        <img src="{% static '' %}{{ current.product.intake.unit_icon }}"
              class="intake-icon"
              alt="Pill">
     </div>

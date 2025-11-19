@@ -93,16 +93,22 @@ class PosologyIntake(models.Model):
         return UNIT_ICON.get(self.intake_unit)
 
     @property
+    def time_of_day_color(self):
+        TIME_OF_DAY = {
+            TimeOfDay.MORNING: "var(--primary-yellow, #FEFDF3)",
+            TimeOfDay.EVENING: "var(--primary-blue, #EFFAFF)",
+            TimeOfDay.MIXED: "var(--secondary-green, #EFFFF4)",
+        }
+        return TIME_OF_DAY.get(self.time_of_day)
+
+    @property
     def time_of_day_icon(self):
         """Return SVG path for the intake time of day"""
         TIME_OF_DAY = {
             TimeOfDay.MORNING: "templates_app/images/morning.svg",
             TimeOfDay.EVENING: "templates_app/images/evening.svg",
+            TimeOfDay.MIXED: "templates_app/images/morning_evening.svg",
         }
-
-        # Exception when icon depends on intake condition instead of time of day
-        if self.intake_condition == "EMPTY_STOMACH":
-            return "templates_app/images/empty_stomach.svg"
         return TIME_OF_DAY.get(self.time_of_day)
 
     @property
