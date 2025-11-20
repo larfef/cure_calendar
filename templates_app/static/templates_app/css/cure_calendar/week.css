@@ -12,12 +12,13 @@
 }
 
 .week-content__left-corner {
+    width: calc(var(--cell-width) + 1px);
     height: calc(var(--table-header-height));
     flex-shrink: 0;
     background: var(--neutral-gray-50, #FAFAFA);
     border-top: 1px solid var(--neutral-gray-300, #D1D9D8);
     border-bottom: 1px solid var(--neutral-gray-300, #D1D9D8);
-    border-left: 1px solid var(--neutral-gray-300, #D1D9D8);
+    border-right: 1px solid var(--neutral-gray-300, #D1D9D8);
 }
 
 .week-col__morning-background {
@@ -28,8 +29,12 @@
     background: #EFFAFF;
 }
 
+.week-col__mixed-background {
+    background: var(--secondary-green, #EFFFF4);
+}
+
 .week-content__icon-container {
-    width: calc(var(--cell-width) + 1pt);
+    width: calc(var(--cell-width) + 1px);
     height: 100%;
     display: flex;
     align-items: center;
@@ -44,6 +49,11 @@
 .week-content__icon-evening-size {
     width: 10pt;
     height: 10pt;
+}
+
+.week-content__icon-mixed-size {
+    width: 12pt;
+    height: 24pt;
 }
 
 .week-col__time{

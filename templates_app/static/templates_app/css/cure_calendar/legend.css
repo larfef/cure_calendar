@@ -32,7 +32,7 @@
 
 .legend__time-container--child {
     display: flex;
-    height: 47.573pt;
+    min-height: 47.573pt;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -85,9 +85,20 @@
     align-self: stretch;
 }
 
-.legend__icon-svg {
-    width: 20.402pt;
-    height: 18.628pt;
+.legend__icon-svg--morning {
+    width: 17pt;
+    height: 17pt;
+}
+
+.legend__icon-svg--evening {
+    width: 12pt;
+    height: 12pt;
+}
+
+.legend__icon-svg--mixed {
+    width: 18pt;
+    height: 38pt;
+    margin-top: 4pt;
 }
 
 .legend__icon-title {

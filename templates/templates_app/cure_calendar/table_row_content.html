@@ -2,16 +2,16 @@
 <div class="line-container"
      style="position: absolute;
             width: 100%;
-            {{ current.padding_left }}">
+            {{ current.style.padding_left }}">
     {% if current.product %}
         {% include "templates_app/cure_calendar/intake.html" %}
     {% endif %}
-    {% if current.restart and not current.product %}
-        <div class="line-container__restart" style="{{ current.restart_style }}">{{ text.line.restart }}</div>
+    {% if current.text == 'restart' and not current.product %}
+        <div class="line-container__restart" style="{{ current.style.restart }}">{{ text.line.restart }}</div>
     {% endif %}
     {% if current.type == 'default' %}
         {% if current.product_label %}<div class="line-container__label">{{ current.product_label }}</div>{% endif %}
-        <div class="line-green" style="{{ current.line_style }}"></div>
+        <div class="line-green" style="{{ current.style.line }}"></div>
     {% elif current.type == 'arrow' %}
         <div class="line-green"></div>
         <div style="display: flex;
@@ -26,11 +26,11 @@
                  src="/static/templates_app/images/green-arrow.png">
         </div>
     {% elif current.type == 'stop' %}
-        <div class="line-container__stop" style="{{ current.stop_style }}">{{ text.line.stop }}</div>
-        <div class="line-red" style="{{ current.line_style }}"></div>
+        <div class="line-container__stop" style="{{ current.style.stop }}">{{ text.line.stop }}</div>
+        <div class="line-red" style="{{ current.style.line }}"></div>
     {% elif current.type == 'pause' %}
-        <div class="pause-container" style="{{ current.line_style }}">
-            <div class="pause-line__dashed" style="{{ current.line_style }}"></div>
+        <div class="pause-container" style="{{ current.style.line }}">
+            <div class="pause-line__dashed" style="{{ current.style.line }}"></div>
             <div class="pause-container__text">
                 <div class="pause-text">{{ text.line.pause|default:"Pause" }}</div>
             </div>

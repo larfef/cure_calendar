@@ -5,7 +5,7 @@
         {% for v in legend.time %}
             <div class="legend__time-container--child"
                  style="background-color: {{ v.bg_color }}">
-                <img class="legend__icon-svg" src="{% static v.icon.src %}">
+                <img class="{{ v.icon.class }}" src="{% static v.icon.src %}">
                 <div class="legend__icon-title">{{ v.label }}</div>
             </div>
             {% if not forloop.last %}<div class="legend__line--grey"></div>{% endif %}

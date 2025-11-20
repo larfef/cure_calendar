@@ -1,0 +1,29 @@
+{% load static %}
+<div class="week-container">
+    <div class="week-container_intake">
+        {% if week.morning.enabled %}
+            <div>
+                {% with content=week.morning.rows table_header=week.table_header icon="morning" %}
+                    {% include "templates_app/cure_calendar/assets/table.html" with rows=month.morning.num_line %}
+                {% endwith %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="week-container_intake">
+        {% if week.evening.enabled %}
+            <div>
+                {% with rows=week.evening.rows %}
+                    {% if not week.morning.enabled %}
+                        {% with table_header=week.table_header content=week.evening.rows icon="evening" %}
+                            {% include "templates_app/cure_calendar/assets/table.html" with rows=month.evening.num_line %}
+                        {% endwith %}
+                    {% else %}
+                        {% with content=week.evening.rows table_header=False icon="evening" %}
+                            {% include "templates_app/cure_calendar/assets/table.html" with rows=month.evening.num_line %}
+                        {% endwith %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        {% endif %}
+    </div>
+</div>

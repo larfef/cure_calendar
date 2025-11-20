@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
+from urllib3 import HTTPResponse
 from templates_app.classes.posology_calculation_model import PosologyCalculationModel
+from templates_app.constants.calendar_constants import text
 from templates_app.models.product import Product
 from templates_app.classes.table_row_content import TableRowContent
 import copy
@@ -21,7 +23,7 @@ MONTH_DAY = 4 * NB_DAY
 
 
 def set_table_lines_for_month(month):
-    arr = ["morning", "evening"]
+    arr = ["morning", "evening", "mixed"]
 
     for v in arr:
         month[v]["num_line"] = max(len(w[v]["rows"]) for w in month["weeks"])
@@ -47,6 +49,7 @@ def compute_week_content(product, week, week_index):
             # the A4 dimensions.
             if product["delay"] > 28 or product["delay"] < 22
             else 0,
+            time_col=not week_index % 4,
             product=product,
         ).get_context()
         week[day_time]["rows"].append(content)
@@ -57,6 +60,7 @@ def compute_week_content(product, week, week_index):
         content = TableRowContent(
             line_type="default" if week_index % 4 != 3 else "arrow",
             start=0,
+            time_col=not week_index % 4,
             product_label=product["label"] if not week_index % 4 else False,
         ).get_context()
         week[day_time]["rows"].append(content)
@@ -65,16 +69,16 @@ def compute_week_content(product, week, week_index):
             line_type="stop",
             start=0,
             end=7 - (current_week_end - posology_end),
-            stop=True,
+            time_col=not week_index % 4,
         ).get_context()
         week[day_time]["rows"].append(content)
     elif (current_week_end // (MONTH_DAY + 1)) == (posology_end // (MONTH_DAY + 1)):
         week[day_time]["rows"].append("")
-    elif product["delay"] > current_week_end:
+    elif product["delay"] >= current_week_end:
         week[day_time]["rows"].append("")
 
 
-def test_calendar(request):
+def calendar(request):
     try:
         with transaction.atomic():
             # Initial db state
@@ -82,11 +86,11 @@ def test_calendar(request):
 
             # Create mock products
             a5_products = [
-                create_mock_a5_product(labels[v])
+                create_mock_a5_product(labels[v][0])
                 # for v in random.sample(
                 #     range(0, len(labels)), random.randint(4, len(labels))
                 # )
-                for v in random.sample(range(0, len(labels)), 4)
+                for v in random.sample(range(0, len(labels)), 6)
                 # create_mock_a5_product(labels[0])
             ]
 
@@ -124,6 +128,7 @@ def test_calendar(request):
                 "evening": {"enabled": True, "rows": []},
                 "time_col": False,
                 "table_header": False,
+                "mixed": {"enabled": True, "rows": []},
             }
 
             tot_weeks = math.ceil(calculator.get_microbiote_phase_end() / 7)
@@ -143,6 +148,7 @@ def test_calendar(request):
                             "weeks": [],
                             "evening": {"num_line": 0},
                             "morning": {"num_line": 0},
+                            "mixed": {"num_line": 0},
                         }
                     )
 
@@ -171,40 +177,14 @@ def test_calendar(request):
                 week["morning"]["enabled"] = (
                     months[current_month]["morning"]["num_line"] != 0
                 )
+                week["mixed"]["enabled"] = (
+                    months[current_month]["mixed"]["num_line"] != 0
+                )
                 pass
 
             context = {
-                "text": {
-                    "header": {
-                        "1": "Calendrier Symp",
-                    },
-                    "table": {"header": ["L", "M", "M", "J", "V", "S", "D"]},
-                    "line": {
-                        "stop": "Arrêter",
-                        "restart": "Reprendre",
-                    },
-                    "legend": {"title": "Légende", "unit_title": "Prise"},
-                },
+                "text": text,
                 "months": months,
-                # "legend": {
-                # {
-                #     "unit_icon": p["intake"].unit_icon,
-                #     "unit_label": p["intake"].unit_label,
-                #     "time": {
-                #         "icon": {
-                #             "src": p["intake"].time_of_day_icon,
-                #         },
-                #         "label": p["intake"].time_of_day_label,
-                #         "bg_color": p["intake"].time_of_day_color,
-                #     },
-                # }
-                # for i, p in enumerate(calculator.products)
-                # if not any(
-                #     p["intake"].unit_icon == prev["intake"].unit_icon
-                #     and p["intake"].unit_label == prev["intake"].unit_label
-                #     and p["intake"].time_of_day == prev["intake"].time_of_day
-                #     for prev in calculator.products[:i]
-                # )
                 "legend": {
                     "unit": [
                         {
@@ -222,6 +202,7 @@ def test_calendar(request):
                         {
                             "icon": {
                                 "src": p["intake"].time_of_day_icon,
+                                "class": p["intake"].time_of_day_icon_class,
                             },
                             "label": p["intake"].time_of_day_label,
                             "bg_color": p["intake"].time_of_day_color,
@@ -236,7 +217,7 @@ def test_calendar(request):
             }
 
             response = render(
-                request, "templates_app/cure_calendar/assets.html", context
+                request, "templates_app/cure_calendar/calendar.html", context
             )
             transaction.set_rollback(True)
             return response
@@ -246,9 +227,9 @@ def test_calendar(request):
         return HttpResponse(f"Error in test view: {str(e)}", status=500)
 
 
-def download_calendar_pdf(request):
+def calendar_pdf(request):
     """Generate and display PDF of the cure calendar in browser"""
-    calendar_url = request.build_absolute_uri("/assets")
+    calendar_url = request.build_absolute_uri("/calendar")
 
     try:
         pdf_bytes = generate_pdf_from_url(calendar_url)
@@ -260,6 +241,51 @@ def download_calendar_pdf(request):
         return response
     except Exception as e:
         return HttpResponse(f"Error generating PDF: {str(e)}", status=500)
+
+
+def assets(request):
+    line_1 = TableRowContent(
+        line_type="default",
+        # text="restart",
+        time_col=True,
+        start=1,
+        end=4,
+    ).get_context()
+
+    line_2 = TableRowContent(
+        line_type="default",
+        # text="restart",
+        start=1,
+        end=4,
+    ).get_context()
+
+    context = {
+        "text": text,
+        "month": {"morning": {"num_line": 2}, "evening": {"num_line": 2}},
+        "weeks": [
+            {
+                "time_col": True,
+                "morning": {"enabled": True, "rows": [line_1]},
+                "evening": {"enabled": True, "rows": []},
+                "table_header": True,
+            },
+            {
+                "time_col": False,
+                "morning": {"enabled": True, "rows": [line_2]},
+                "evening": {"enabled": True, "rows": []},
+                "table_header": True,
+            },
+        ],
+        "empty_week": {"enabled": True},
+    }
+
+    try:
+        response = render(
+            request, "templates_app/cure_calendar/assets/base.html", context
+        )
+        return response
+    except Exception as e:
+        return HttpResponse(f"Error rendering template: {e}")
 
 
 def cure(request):

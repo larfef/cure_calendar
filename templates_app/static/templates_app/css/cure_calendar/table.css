@@ -25,6 +25,10 @@
     width: var(--cell-width);
 }
 
+.table-header__cell--day-icon {
+    width: calc( 6 * var(--cell-width) / 7)
+}
+
 .table-header__vertical-line {
     width: 1px;
     height: var(--table-header-height);

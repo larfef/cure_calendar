@@ -112,6 +112,15 @@ class PosologyIntake(models.Model):
         return TIME_OF_DAY.get(self.time_of_day)
 
     @property
+    def time_of_day_icon_class(self):
+        TIME_OF_DAY = {
+            TimeOfDay.MORNING: "legend__icon-svg--morning",
+            TimeOfDay.EVENING: "legend__icon-svg--evening",
+            TimeOfDay.MIXED: "legend__icon-svg--mixed",
+        }
+        return TIME_OF_DAY.get(self.time_of_day)
+
+    @property
     def time_of_day_label(self):
         return TimeOfDay(self.time_of_day).label
 

@@ -4,7 +4,7 @@ from templates_app.models.product import Product
 from templates_app.types.product import A5Product, AdaptedA5Product
 
 
-CORTISOL_PHASE_DURATION_DAYS = 28
+CORTISOL_PHASE_DURATION_DAYS = 29
 MAX_DAYS_BETWEEN_PRODUCT_UNIT = 30
 
 
@@ -114,6 +114,8 @@ class PosologyCalculationModel:
                 product["servings"] / total_daily_quantity
             )
 
+            # has_multiple_units = self._is_product_multiple_unit(product)
+
             # Store normalized product with pre-computed values
             normalized.append(
                 {
@@ -132,6 +134,14 @@ class PosologyCalculationModel:
             normalized.sort(key=lambda p: p["delay"])
 
         return normalized
+
+    # def has_multiple_unit(self, product):
+
+    #     multiple_unit = {
+    #         "always": [
+
+    #         ]
+    #     }
 
     def get_microbiote_phase_start(self):
         if self.cortisol_phase_duration > 0:
@@ -156,6 +166,9 @@ class PosologyCalculationModel:
         return product["servings"] / product["total_daily_quantity"]
 
     def get_pause_between_product_unit(self, product: AdaptedA5Product):
+        if not self.cortisol_phase_duration:
+            return 0
+
         total_daily_intakes = self.get_total_daily_intakes_per_product_unit(product)
 
         if total_daily_intakes > MAX_DAYS_BETWEEN_PRODUCT_UNIT:
