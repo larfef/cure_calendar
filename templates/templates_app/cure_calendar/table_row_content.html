@@ -26,7 +26,7 @@
                  src="/static/templates_app/images/green-arrow.png">
         </div>
     {% elif current.type == 'stop' %}
-        <div class="line-container__stop" style="{{ current.style.stop }}">{{ text.line.stop }}</div>
+        <div class="line-container__stop" style="{{ current.style.stop }}">{{ current.text }}</div>
         <div class="line-red" style="{{ current.style.line }}"></div>
     {% elif current.type == 'pause' %}
         <div class="pause-container" style="{{ current.style.line }}">

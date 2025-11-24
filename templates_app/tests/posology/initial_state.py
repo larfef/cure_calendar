@@ -43,7 +43,10 @@ time_of_day = ["MORNING", "EVENING", "MIXED"]
 def populate_database():
     for label in labels:
         product = Product.objects.create(
-            id=label[1], label=label[0], servings=random.randint(30, 120)
+            id=label[1],
+            label=label[0],
+            servings=30,
+            # servings=random.randint(30, 120)
         )
         scheme = PosologyScheme.objects.create(
             product=product,

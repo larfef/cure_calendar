@@ -40,12 +40,13 @@
                 <div class="table-content__line {% if forloop.first and table_header == False %}table-content__line--first{% endif %}">
                     {% if forloop.counter0 < content|length %}
                         {% with current=content|index:forloop.counter0 %}
-                            {% include "templates_app/cure_calendar/table_row_content.html" %}
+                            {% include "templates_app/cure_calendar/assets/table_row_content.html" %}
                         {% endwith %}
                     {% endif %}
                     {% with n_cell=text.table.header|length %}
                         {% for i in "0"|center:n_cell %}
-                            <div class="{% if week.time_col %}table-header__cell--day-icon{% else %}table-header__cell{% endif %}"></div>
+                            <div class="{% if week.time_col %}table-header__cell--day-icon{% else %}table-header__cell{% endif %}"
+                                 style="{{ cell_bg_color }}"></div>
                             {% if forloop.counter < n_cell %}<div class="table-content__vertical-line"></div>{% endif %}
                         {% endfor %}
                     {% endwith %}

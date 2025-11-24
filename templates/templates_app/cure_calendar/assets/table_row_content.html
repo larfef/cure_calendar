@@ -1,0 +1,10 @@
+{% load static %}
+<div class="line-container"
+     style="position: absolute;
+            width: 100%;
+            {{ current.container.padding_left }}">
+    {% if current.product %}
+        {% include "templates_app/cure_calendar/intake.html" %}
+    {% endif %}
+    {% for content in current.contents %}<div class="{{ content.class }}" style="{{ content.style }}"></div>{% endfor %}
+</div>

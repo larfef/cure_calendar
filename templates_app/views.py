@@ -1,14 +1,18 @@
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
-from urllib3 import HTTPResponse
 from templates_app.classes.posology_calculation_model import PosologyCalculationModel
 from templates_app.constants.calendar_constants import text
-from templates_app.models.product import Product
-from templates_app.classes.table_row_content import TableRowContent
+from templates_app.logging.yaml_writer import write_products_to_yaml
+from templates_app.classes.table_row_content import (
+    ContentDict,
+    ContentType,
+    LineContent,
+    TableRowContent,
+    TextType,
+)
 import copy
 import math
-from templates_app.models.product import Product
 import random
 from templates_app.tests.posology.initial_state import (
     populate_database,
@@ -86,35 +90,20 @@ def calendar(request):
 
             # Create mock products
             a5_products = [
-                create_mock_a5_product(labels[v][0])
+                # create_mock_a5_product(labels[v][0])
                 # for v in random.sample(
                 #     range(0, len(labels)), random.randint(4, len(labels))
                 # )
-                for v in random.sample(range(0, len(labels)), 6)
-                # create_mock_a5_product(labels[0])
+                # for v in random.sample(range(0, len(labels)), 6)
+                create_mock_a5_product(labels[8][0])
             ]
-
-            # a5_products = [
-            #     {
-            #         "label": labels[0],
-            #         # "delay": 0,
-            #         "delay": 0,
-            #         # "phase": random.randint(1, 2),
-            #         "phase": 1,
-            #     },
-            #     {
-            #         "label": labels[1],
-            #         # "delay": 0,
-            #         "delay": 2,
-            #         # "phase": random.randint(1, 2),
-            #         "phase": 1,
-            #     },
-            # ]
 
             # Compute states common to products
             calculator = PosologyCalculationModel(
                 a5_products, cortisol_phase=random.randint(0, 1)
             )
+
+            write_products_to_yaml(calculator.to_dict(), "products_snapshot.yaml")
 
             # Initialize months array
             months = []
@@ -244,21 +233,19 @@ def calendar_pdf(request):
 
 
 def assets(request):
-    line_1 = TableRowContent(
-        line_type="default",
-        # text="restart",
-        time_col=True,
-        start=1,
-        end=4,
-    ).get_context()
-
-    line_2 = TableRowContent(
-        line_type="default",
-        # text="restart",
-        start=1,
-        end=4,
-    ).get_context()
-
+    content: list[ContentDict] = [
+        {
+            "start": 0,
+            "end": 4,
+            "text": {
+                "value": "Fin du pot",
+                "type": TextType.STOP_PRODUCT,
+                "enabled": True,
+            },
+            "type": ContentType.GREEN_LINE,
+        }
+    ]
+    line_1 = LineContent(content).get_context()
     context = {
         "text": text,
         "month": {"morning": {"num_line": 2}, "evening": {"num_line": 2}},
@@ -267,12 +254,7 @@ def assets(request):
                 "time_col": True,
                 "morning": {"enabled": True, "rows": [line_1]},
                 "evening": {"enabled": True, "rows": []},
-                "table_header": True,
-            },
-            {
-                "time_col": False,
-                "morning": {"enabled": True, "rows": [line_2]},
-                "evening": {"enabled": True, "rows": []},
+                "mixed": {"enabled": False, "rows": []},
                 "table_header": True,
             },
         ],

@@ -1,11 +1,15 @@
 import math
 from typing import Dict, List, Union
+from templates_app.constants.posology_constants import (
+    DELAY_RULES,
+    MULTIPLE_PRODUCT_UNIT_RULES,
+)
 from templates_app.models.product import Product
 from templates_app.types.product import A5Product, AdaptedA5Product
 
 
-CORTISOL_PHASE_DURATION_DAYS = 29
-MAX_DAYS_BETWEEN_PRODUCT_UNIT = 30
+CORTISOL_PHASE_DURATION_DAYS = 28
+MAX_DAYS_BETWEEN_PRODUCT_UNIT = 28
 
 
 def adapter_a5_product(products: List[A5Product]) -> List[AdaptedA5Product]:
@@ -27,6 +31,7 @@ def adapter_a5_product(products: List[A5Product]) -> List[AdaptedA5Product]:
         if adapted_product:
             new_products.append(
                 {
+                    "id": adapted_product.id,
                     "label": product["label"],
                     "nutrients": product.get("nutrients"),
                     "posology": adapted_product.posology_schemes.all(),  # QuerySet
@@ -62,6 +67,7 @@ class PosologyCalculationModel:
         else:
             raw_products = products
 
+        self.cortisol_phase = cortisol_phase
         self.cortisol_phase_duration = cortisol_phase_duration * cortisol_phase
         # Validate and normalize products
         self.products = self._validate_and_normalize_products(raw_products)
@@ -114,13 +120,16 @@ class PosologyCalculationModel:
                 product["servings"] / total_daily_quantity
             )
 
-            # has_multiple_units = self._is_product_multiple_unit(product)
+            new_delay = self._compute_product_delay(product["id"], product["phase"])
 
             # Store normalized product with pre-computed values
             normalized.append(
                 {
+                    "id": product["id"],
                     "label": product["label"],
                     "delay": product["delay"]
+                    if not new_delay
+                    else new_delay
                     + self.cortisol_phase_duration * (product["phase"] == 2),
                     "nutrients": product.get("nutrients"),
                     "phase": product["phase"],
@@ -133,15 +142,42 @@ class PosologyCalculationModel:
             )
             normalized.sort(key=lambda p: p["delay"])
 
+        for dict in normalized:
+            dict.update(
+                {
+                    "quantity": 1
+                    if not self._product_second_unit(
+                        dict["id"], dict["phase"], dict["delay"], normalized
+                    )
+                    else 2
+                }
+            )
         return normalized
 
-    # def has_multiple_unit(self, product):
+    def _compute_product_delay(self, id: int, phase: int):
+        new_delay = DELAY_RULES[self.cortisol_phase].get("id")
+        if not new_delay:
+            return None
 
-    #     multiple_unit = {
-    #         "always": [
+        if self.cortisol_phase_duration and phase == 2:
+            new_delay += self.cortisol_phase_duration
 
-    #         ]
-    #     }
+        return new_delay
+
+    def _product_second_unit_exceptions(self, id: int, delay: int, products: list):
+        # 2 Mucopure units when Permea Intest isn't recommended
+        if id == 13:
+            return not any(p["id"] == 25 for p in products)
+        else:
+            return not self.cortisol_phase and not delay
+
+    def _product_second_unit(self, id: int, phase: int, delay: int, products: list):
+        if id in MULTIPLE_PRODUCT_UNIT_RULES["exceptions"]:
+            return self._product_second_unit_exceptions(id, delay, products)
+
+        # When product id is in always list
+        # It means there is always a second product item
+        return id in MULTIPLE_PRODUCT_UNIT_RULES[self.cortisol_phase][phase]["always"]
 
     def get_microbiote_phase_start(self):
         if self.cortisol_phase_duration > 0:
@@ -186,84 +222,41 @@ class PosologyCalculationModel:
             / product["servings"]
         )
 
+    def to_dict(self):
+        """Return a serializable dictionary representation of products."""
+        serializable_products = []
 
-# class PosologyCalculationModel:
-#     def __init__(
-#         self,
-#         products: Union[List[A5Product], List[AdaptedA5Product]],
-#         cortisol_phase_duration: int = CORTISOL_PHASE_DURATION_DAYS,
-#         adapted: bool = False,
-#     ):
-#         if not products:
-#             raise ValueError("products cannot be None or empty")
+        for product in self.products:
+            serializable_product = {
+                "id": product["id"],
+                "label": product["label"],
+                "delay": product["delay"],
+                "phase": product["phase"],
+                "quantity": product["quantity"],
+                "servings": product["servings"],
+                "total_daily_quantity": product["total_daily_quantity"],
+                "total_daily_intakes_per_unit": product["total_daily_intakes_per_unit"],
+            }
 
-#         # Convert A5Product → AdaptedA5Product
-#         if not adapted:
-#             self.products = adapter_a5_product(products)
-#         else:
-#             self.products = products
+            if product.get("nutrients"):
+                serializable_product["nutrients"] = product["nutrients"]
 
-#         self.cortisol_phase_duration = cortisol_phase_duration
+            if product.get("posology_scheme"):
+                ps = product["posology_scheme"]
+                serializable_product["posology_scheme"] = {
+                    "duration_value": ps.duration_value,
+                    "day_time": ps.day_time,
+                }
 
-#     def get_microbiote_phase_start(self):
-#         return (
-#             self.cortisol_phase_duration
-#             + min(self.products.values(), key=lambda p: p["delay"])["delay"]
-#         )
+            if product.get("intake"):
+                intake = product["intake"]
+                serializable_product["intake"] = {
+                    "time_of_day": intake.time_of_day,
+                    "time_of_day_label": intake.time_of_day_label,
+                    "unit_icon": intake.unit_icon,
+                    "unit_label": intake.unit_label,
+                }
 
-#     def get_microbiote_phase_end(self):
-#         max_product = max(
-#             self.products.values(),
-#             key=lambda p: p["delay"] + p["posology"].first().duration_value,
-#         )
-#         return (
-#             self.cortisol_phase_duration
-#             + max_product["delay"]
-#             + max_product["posology"].first().duration_value
-#         )
+            serializable_products.append(serializable_product)
 
-#     def get_product_from_label(self, product_label):
-#         product = self.products.get(product_label)
-#         return product
-
-#     def get_total_daily_intakes_per_product_unit(self, product):
-#         posology = product.get("posology")
-#         posology_scheme = posology.first()
-
-#         if not posology_scheme:
-#             return None
-
-#         total_daily_quantity = posology_scheme.get_total_daily_quantity()
-
-#         if not total_daily_quantity:
-#             return None
-
-#         return product.get("servings", 0) / total_daily_quantity
-
-#     def get_pause_between_product_unit(self, product: AdaptedA5Product):
-#         total_daily_intakes = self.get_total_daily_intakes_per_product_unit(product)
-#         posology = product.get("posology")
-
-#         if total_daily_intakes > MAX_DAYS_BETWEEN_PRODUCT_UNIT:
-#             return 0
-
-#         posology_scheme = posology.first()
-#         if posology_scheme and posology_scheme.duration_value <= total_daily_intakes:
-#             return 0
-
-#         return MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes
-
-#     def get_product_units_per_posology_scheme(self, product: AdaptedA5Product):
-#         posology = product.get("posology")
-#         posology_scheme = posology.first()
-
-#         if not posology_scheme:
-#             return 0
-
-#         total_daily_quantity = posology_scheme.get_total_daily_quantity()
-
-#         return math.ceil(
-#             total_daily_quantity
-#             * posology_scheme.duration_value
-#             / product.get("servings")
-#         )
+        return serializable_products
