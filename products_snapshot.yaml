@@ -1,16 +1,16 @@
 - id: 11
   label: ADP Biotics
-  delay: 7
-  phase: 2
+  delay: 5
+  phase: 1
   quantity: 2
   servings: 30
-  total_daily_quantity: 12
-  total_daily_intakes_per_unit: 2
+  total_daily_quantity: 4
+  total_daily_intakes_per_unit: 7
   posology_scheme:
-    duration_value: 40
-    day_time: evening
+    duration_value: 55
+    day_time: morning
   intake:
-    time_of_day: EVENING
-    time_of_day_label: Soir
+    time_of_day: MORNING
+    time_of_day_label: Matin
     unit_icon: templates_app/images/drop.svg
     unit_label: Goutte

@@ -236,16 +236,26 @@ def assets(request):
     content: list[ContentDict] = [
         {
             "start": 0,
+            "end": 1,
+            "type": {"css": ContentType.GREEN_LINE, "inline": ContentType.CELL},
+        },
+        {
+            "start": 2,
             "end": 4,
             "text": {
-                "value": "Fin du pot",
+                "value": "Arrêter",
                 "type": TextType.STOP_PRODUCT,
                 "enabled": True,
             },
-            "type": ContentType.GREEN_LINE,
-        }
+            "type": {"css": ContentType.GREEN_LINE, "inline": ContentType.CELL},
+        },
+        {
+            "start": 5,
+            "end": 7,
+            "type": {"css": ContentType.GREEN_LINE, "inline": ContentType.CELL},
+        },
     ]
-    line_1 = LineContent(content).get_context()
+    line_1 = LineContent(content, time_col=True).get_context()
     context = {
         "text": text,
         "month": {"morning": {"num_line": 2}, "evening": {"num_line": 2}},

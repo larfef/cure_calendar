@@ -6,5 +6,10 @@
     {% if current.product %}
         {% include "templates_app/cure_calendar/intake.html" %}
     {% endif %}
-    {% for content in current.contents %}<div class="{{ content.class }}" style="{{ content.style }}"></div>{% endfor %}
+    {% for content in current.contents %}
+        {% if content.text.enabled %}
+            <div class="{{ content.text.class }}" style="{{ content.text.style }}">{{ content.text.value }}</div>
+        {% endif %}
+        <div class="{{ content.class }}" style="{{ content.style }}"></div>
+    {% endfor %}
 </div>
