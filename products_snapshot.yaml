@@ -1,13 +1,13 @@
 - id: 11
   label: ADP Biotics
-  delay: 5
+  delay: 10
   phase: 1
   quantity: 2
   servings: 30
-  total_daily_quantity: 4
-  total_daily_intakes_per_unit: 7
+  total_daily_quantity: 3
+  total_daily_intakes_per_unit: 10
   posology_scheme:
-    duration_value: 55
+    duration_value: 57
     day_time: morning
   intake:
     time_of_day: MORNING

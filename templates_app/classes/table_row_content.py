@@ -103,6 +103,8 @@ class LineContent:
 
     def _get_content_inline_style(self, content, funcs):
         styles = []
+        if not funcs:
+            return
         for func in funcs:
             val = func(content)
             if val:

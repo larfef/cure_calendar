@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
+from templates_app.classes.calendar_context_builder import CalendarContextBuilder
 from templates_app.classes.posology_calculation_model import PosologyCalculationModel
 from templates_app.constants.calendar_constants import text
 from templates_app.logging.yaml_writer import write_products_to_yaml
@@ -103,107 +104,13 @@ def calendar(request):
                 a5_products, cortisol_phase=random.randint(0, 1)
             )
 
+            # Log products states
             write_products_to_yaml(calculator.to_dict(), "products_snapshot.yaml")
 
-            # Initialize months array
-            months = []
+            # Initialize builder
+            builder = CalendarContextBuilder(calculator)
 
-            # Initialize empty week template dict
-            empty_week = {
-                "morning": {
-                    "enabled": True,
-                    "rows": [],
-                },
-                "evening": {"enabled": True, "rows": []},
-                "time_col": False,
-                "table_header": False,
-                "mixed": {"enabled": True, "rows": []},
-            }
-
-            tot_weeks = math.ceil(calculator.get_microbiote_phase_end() / 7)
-
-            # Iterate through all weeks
-            for week_index in range(tot_weeks):
-                # Get current month [0, n_month]
-                current_month = week_index // 4
-
-                # Get current week [0, 4)
-                current_week = week_index % 4
-
-                # Ensure the month dict exists
-                if current_month >= len(months):
-                    months.append(
-                        {
-                            "weeks": [],
-                            "evening": {"num_line": 0},
-                            "morning": {"num_line": 0},
-                            "mixed": {"num_line": 0},
-                        }
-                    )
-
-                # Copy template
-                week = copy.deepcopy(empty_week)
-
-                # Set time column and table header
-                week["time_col"] = current_week == 0
-                week["table_header"] = current_month == 0
-
-                # Append week to current month
-                months[current_month]["weeks"].append(week)
-
-                # Compute week table content
-                for product in calculator.products:
-                    compute_week_content(product, week, week_index)
-
-                set_table_lines_for_month(months[current_month])
-
-                # Enabled each day time if there is
-                # at least one product intake time
-                # in it for the current month
-                week["evening"]["enabled"] = (
-                    months[current_month]["evening"]["num_line"] != 0
-                )
-                week["morning"]["enabled"] = (
-                    months[current_month]["morning"]["num_line"] != 0
-                )
-                week["mixed"]["enabled"] = (
-                    months[current_month]["mixed"]["num_line"] != 0
-                )
-                pass
-
-            context = {
-                "text": text,
-                "months": months,
-                "legend": {
-                    "unit": [
-                        {
-                            "icon": p["intake"].unit_icon,
-                            "label": p["intake"].unit_label,
-                        }
-                        for i, p in enumerate(calculator.products)
-                        if not any(
-                            p["intake"].unit_icon == prev["intake"].unit_icon
-                            and p["intake"].unit_label == prev["intake"].unit_label
-                            for prev in calculator.products[:i]
-                        )
-                    ],
-                    "time": [
-                        {
-                            "icon": {
-                                "src": p["intake"].time_of_day_icon,
-                                "class": p["intake"].time_of_day_icon_class,
-                            },
-                            "label": p["intake"].time_of_day_label,
-                            "bg_color": p["intake"].time_of_day_color,
-                        }
-                        for i, p in enumerate(calculator.products)
-                        if not any(
-                            p["intake"].time_of_day == prev["intake"].time_of_day
-                            for prev in calculator.products[:i]
-                        )
-                    ],
-                },
-            }
+            context = builder.build()
 
             response = render(
                 request, "templates_app/cure_calendar/calendar.html", context
