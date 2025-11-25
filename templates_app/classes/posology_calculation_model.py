@@ -9,7 +9,7 @@ from templates_app.types.product import A5Product, AdaptedA5Product
 
 
 CORTISOL_PHASE_DURATION_DAYS = 28
-MAX_DAYS_BETWEEN_PRODUCT_UNIT = 28
+MAX_DAYS_BETWEEN_PRODUCT_UNIT = 16
 
 
 def adapter_a5_product(products: List[A5Product]) -> List[AdaptedA5Product]:
@@ -149,7 +149,8 @@ class PosologyCalculationModel:
                     if not self._product_second_unit(
                         dict["id"], dict["phase"], dict["delay"], normalized
                     )
-                    else 2
+                    else 2,
+                    "pause_duration": self.get_pause_between_product_unit(dict),
                 }
             )
         return normalized
@@ -202,8 +203,8 @@ class PosologyCalculationModel:
         return product["servings"] / product["total_daily_quantity"]
 
     def get_pause_between_product_unit(self, product: AdaptedA5Product):
-        if not self.cortisol_phase_duration:
-            return 0
+        # if not self.cortisol_phase_duration:
+        #     return 0
 
         total_daily_intakes = self.get_total_daily_intakes_per_product_unit(product)
 
@@ -213,7 +214,7 @@ class PosologyCalculationModel:
         if product["posology_scheme"].duration_value <= total_daily_intakes:
             return 0
 
-        return MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes
+        return int(MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes)
 
     def get_product_units_per_posology_scheme(self, product: AdaptedA5Product):
         return math.ceil(

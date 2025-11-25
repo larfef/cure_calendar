@@ -67,7 +67,7 @@
 }
 
 .pause-line__dashed {
-    border-top: 1px dashed grey;
+    border-top: 1pt dashed grey;
     align-self: center;
 }
 

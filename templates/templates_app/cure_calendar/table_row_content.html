@@ -2,38 +2,14 @@
 <div class="line-container"
      style="position: absolute;
             width: 100%;
-            {{ current.style.padding_left }}">
-    {% if current.product %}
-        {% include "templates_app/cure_calendar/intake.html" %}
-    {% endif %}
-    {% if current.text == 'restart' and not current.product %}
-        <div class="line-container__restart" style="{{ current.style.restart }}">{{ text.line.restart }}</div>
-    {% endif %}
-    {% if current.type == 'default' %}
-        {% if current.product_label %}<div class="line-container__label">{{ current.product_label }}</div>{% endif %}
-        <div class="line-green" style="{{ current.style.line }}"></div>
-    {% elif current.type == 'arrow' %}
-        <div class="line-green"></div>
-        <div style="display: flex;
-                    position: absolute;
-                    right: 0;
-                    align-self: center;
-                    min-width: 0;
-                    overflow: hidden">
-            <img width="4"
-                 height="7"
-                 style="flex-shrink: 0"
-                 src="/static/templates_app/images/green-arrow.png">
-        </div>
-    {% elif current.type == 'stop' %}
-        <div class="line-container__stop" style="{{ current.style.stop }}">{{ current.text }}</div>
-        <div class="line-red" style="{{ current.style.line }}"></div>
-    {% elif current.type == 'pause' %}
-        <div class="pause-container" style="{{ current.style.line }}">
-            <div class="pause-line__dashed" style="{{ current.style.line }}"></div>
-            <div class="pause-container__text">
-                <div class="pause-text">{{ text.line.pause|default:"Pause" }}</div>
-            </div>
-        </div>
-    {% endif %}
+            {{ current.container.padding_left }}">
+    {% for content in current.contents %}
+        {% if content.product %}
+            {% include "templates_app/cure_calendar/intake.html" with product=content.product %}
+        {% endif %}
+        {% if content.text.enabled %}
+            <div class="{{ content.text.class }}" style="{{ content.text.style }}">{{ content.text.value }}</div>
+        {% endif %}
+        <div class="{{ content.class }}" style="{{ content.style }}"></div>
+    {% endfor %}
 </div>

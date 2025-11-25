@@ -45,19 +45,21 @@ def populate_database():
         product = Product.objects.create(
             id=label[1],
             label=label[0],
-            servings=30,
+            servings=20,
             # servings=random.randint(30, 120)
         )
         scheme = PosologyScheme.objects.create(
             product=product,
-            duration_value=random.randint(40, 60),
-            # duration_value=21,
+            # duration_value=random.randint(40, 60),
+            duration_value=21,
         )
 
         PosologyIntake.objects.create(
             scheme=scheme,
-            quantity=random.randint(1, 4),
-            frequency=random.randint(1, 3),
+            # quantity=random.randint(1, 4),
+            # frequency=random.randint(1, 3),
+            quantity=2,
+            frequency=1,
             time_of_day=time_of_day[random.randint(0, 2)],
             intake_unit=intake_units[random.randint(0, 2)],
         )
@@ -66,8 +68,8 @@ def populate_database():
 def create_mock_a5_product(label: str):
     return {
         "label": label,
-        # "delay": 6,
-        "delay": random.randint(0, 14),
+        "delay": 2,
+        # "delay": random.randint(0, 14),
         "phase": random.randint(1, 2),
         # "phase": 1,
     }

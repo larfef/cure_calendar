@@ -10,7 +10,7 @@ text = {
     "legend": {"title": "Légende", "unit_title": "Prise"},
 }
 
-CALENDAR_TEXTS = {
+CALENDAR_TEXT = {
     "header": {
         "1": "Calendrier Symp",
     },

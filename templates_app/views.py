@@ -1,86 +1,23 @@
+import random
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
 from templates_app.classes.calendar_context_builder import CalendarContextBuilder
 from templates_app.classes.posology_calculation_model import PosologyCalculationModel
-from templates_app.constants.calendar_constants import text
+from templates_app.constants.calendar_constants import CALENDAR_TEXT
 from templates_app.logging.yaml_writer import write_products_to_yaml
-from templates_app.classes.table_row_content import (
+from templates_app.classes.line_content import (
     ContentDict,
     ContentType,
     LineContent,
-    TableRowContent,
     TextType,
 )
-import copy
-import math
-import random
 from templates_app.tests.posology.initial_state import (
     populate_database,
     create_mock_a5_product,
     labels,
 )
 from templates_app.utils.pdf_generator import generate_pdf_from_url
-
-NB_DAY = 7
-
-MONTH_DAY = 4 * NB_DAY
-
-
-def set_table_lines_for_month(month):
-    arr = ["morning", "evening", "mixed"]
-
-    for v in arr:
-        month[v]["num_line"] = max(len(w[v]["rows"]) for w in month["weeks"])
-
-
-def compute_week_content(product, week, week_index):
-    # Check if content will be render in evening or
-    # in morning row
-    day_time = product["posology_scheme"].day_time
-
-    # Get posology scheme duration with product delay
-    posology_end = product["posology_scheme"].duration_value + product["delay"]
-
-    current_week_start = week_index * NB_DAY
-    current_week_end = (week_index + 1) * NB_DAY
-    if product["delay"] < current_week_end and product["delay"] >= current_week_start:
-        content = TableRowContent(
-            line_type="default" if week_index % 4 != 3 else "arrow",
-            start=product["delay"] - current_week_start
-            # Use delay to offset the product in the week table only
-            # when the product does not start in the last week of the month.
-            # Otherwise, some product displays overflow from
-            # the A4 dimensions.
-            if product["delay"] > 28 or product["delay"] < 22
-            else 0,
-            time_col=not week_index % 4,
-            product=product,
-        ).get_context()
-        week[day_time]["rows"].append(content)
-    elif (
-        product["posology_scheme"].duration_value + product["delay"] > current_week_end
-        and product["delay"] < current_week_start
-    ):
-        content = TableRowContent(
-            line_type="default" if week_index % 4 != 3 else "arrow",
-            start=0,
-            time_col=not week_index % 4,
-            product_label=product["label"] if not week_index % 4 else False,
-        ).get_context()
-        week[day_time]["rows"].append(content)
-    elif posology_end <= current_week_end and posology_end > current_week_start:
-        content = TableRowContent(
-            line_type="stop",
-            start=0,
-            end=7 - (current_week_end - posology_end),
-            time_col=not week_index % 4,
-        ).get_context()
-        week[day_time]["rows"].append(content)
-    elif (current_week_end // (MONTH_DAY + 1)) == (posology_end // (MONTH_DAY + 1)):
-        week[day_time]["rows"].append("")
-    elif product["delay"] >= current_week_end:
-        week[day_time]["rows"].append("")
 
 
 def calendar(request):
@@ -101,7 +38,8 @@ def calendar(request):
 
             # Compute states common to products
             calculator = PosologyCalculationModel(
-                a5_products, cortisol_phase=random.randint(0, 1)
+                a5_products,
+                # cortisol_phase=random.randint(0, 1)
             )
 
             # Log products states
@@ -164,7 +102,7 @@ def assets(request):
     ]
     line_1 = LineContent(content, time_col=True).get_context()
     context = {
-        "text": text,
+        "text": CALENDAR_TEXT,
         "month": {"morning": {"num_line": 2}, "evening": {"num_line": 2}},
         "weeks": [
             {

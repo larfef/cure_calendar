@@ -1,7 +1,7 @@
 import math
 from dataclasses import dataclass
-from typing import Callable, Optional, Any
-from templates_app.classes.table_row_content import (
+from typing import Callable, Any
+from templates_app.classes.line_content import (
     ContentDict,
     ContentType,
     LineContent,
@@ -10,11 +10,9 @@ from templates_app.classes.table_row_content import (
 from templates_app.types.calendar import (
     WeekSchedule,
     MonthSummary,
-    TimeSlotContent,
-    WeekDisplayOptions,
 )
 from templates_app.classes.posology_calculation_model import PosologyCalculationModel
-from templates_app.constants.calendar_constants import CALENDAR_TEXTS, DAY_TIME_SLOTS
+from templates_app.constants.calendar_constants import CALENDAR_TEXT, DAY_TIME_SLOTS
 from templates_app.types.product import NormalizedProduct
 
 
@@ -28,14 +26,41 @@ class ContentSpec:
     text: dict | Callable[[dict], dict] | None
     type_css: ContentType | Callable[[dict], ContentType]
     type_inline: ContentType | Callable[[dict], ContentType] = ContentType.CELL
+    min_width_for_text: int = 2
 
     def resolve(self, ctx: dict) -> ContentDict:
         """Resolve all callable values using context"""
+        start = self.start(ctx) if callable(self.start) else self.start
+        end = self.end(ctx) if callable(self.end) else self.end
+
+        # VALIDATION RULES
+        if start == end:  # Zero-width content
+            return None
+        if end <= 0:  # Invalid end
+            return None
+        if start < 0:  # Start before week
+            return None
+        if start >= 7:  # Start after week
+            return None
+        if start > end:  # Invalid range
+            return None
+
+        text = self.text(ctx) if callable(self.text) else self.text
+
+        if text:
+            user_enabled = text.get("enabled", True)
+
+            # Check width constraint
+            width_allows_text = (end - start) >= self.min_width_for_text
+
+            # Final enabled = user condition AND width check
+            text["enabled"] = user_enabled and width_allows_text
+
         return {
-            "start": self.start(ctx) if callable(self.start) else self.start,
-            "end": self.end(ctx) if callable(self.end) else self.end,
+            "start": start,
+            "end": end,
             "product": self.product(ctx) if callable(self.product) else self.product,
-            "text": self.text(ctx) if callable(self.text) else self.text,
+            "text": text,
             "type": {
                 "css": self.type_css(ctx) if callable(self.type_css) else self.type_css,
                 "inline": self.type_inline(ctx)
@@ -131,9 +156,12 @@ class CalendarContextBuilder:
             "is_first_week": week_index % 4 == 0,
             "is_last_week": week_index % 4 == 3,
             "delay": product["delay"],
+            "quantity": product["quantity"],
+            "first_unit_end": product["delay"]
+            + product["total_daily_intakes_per_unit"],
+            "pause_duration": product["pause_duration"],
         }
 
-        # DECLARATIVE RULES - All configuration visible here!
         rules = [
             ScheduleRule(
                 name="product_starts_this_week",
@@ -158,6 +186,58 @@ class CalendarContextBuilder:
                         if c["is_last_week"]
                         else ContentType.GREEN_LINE,
                     )
+                ],
+            ),
+            ScheduleRule(
+                name="product_pause_between_units",
+                condition=lambda c: (
+                    c["quantity"] > 1
+                    and (
+                        c["first_unit_end"] >= c["week_start"]
+                        or c["first_unit_end"] < c["week_end"]
+                    )
+                ),
+                contents=[
+                    ContentSpec(
+                        start=lambda c: max(0, c["delay"] - c["week_start"]),
+                        end=lambda c: c["first_unit_end"] - c["week_start"],
+                        product=None,
+                        text=lambda c: {
+                            "value": "Arrêter",
+                            "type": TextType.STOP_PRODUCT,
+                            "enabled": True,
+                        },
+                        type_css=ContentType.RED_LINE,
+                        min_width_for_text=1,
+                    ),
+                    ContentSpec(
+                        start=lambda c: max(0, c["first_unit_end"] - c["week_start"]),
+                        end=lambda c: min(
+                            7,
+                            c["first_unit_end"] - c["week_start"] + c["pause_duration"],
+                        ),
+                        product=None,
+                        text=lambda c: {
+                            "value": "Pause",
+                            "type": TextType.PAUSE,
+                            "enabled": True,
+                        },
+                        type_css=ContentType.PAUSE,
+                    ),
+                    ContentSpec(
+                        start=lambda c: min(
+                            7,
+                            c["first_unit_end"] - c["week_start"] + c["pause_duration"],
+                        ),
+                        end=7,
+                        product=None,
+                        text=lambda c: {
+                            "value": "Reprendre",
+                            "type": TextType.RESTART_PRODUCT,
+                            "enabled": True,
+                        },
+                        type_css=ContentType.GREEN_LINE,
+                    ),
                 ],
             ),
             ScheduleRule(
@@ -208,11 +288,11 @@ class CalendarContextBuilder:
             #     ),
             #     contents=[],  # Empty content array
             # ),
-            # ScheduleRule(
-            #     name="product_not_started",
-            #     condition=lambda c: c["delay"] >= c["week_end"],
-            #     contents=[],  # Empty content array
-            # ),
+            ScheduleRule(
+                name="product_not_started",
+                condition=lambda c: c["delay"] >= c["week_end"],
+                contents=[],  # Empty content array
+            ),
         ]
 
         # Debug Statement
@@ -225,14 +305,18 @@ class CalendarContextBuilder:
             if rule.condition(ctx):
                 if rule.contents:
                     # Resolve all ContentSpecs to actual ContentDicts
-                    content_array = [spec.resolve(ctx) for spec in rule.contents]
-
-                    # Create LineContent with resolved array
-                    line_content = LineContent(
-                        contents=content_array, time_col=ctx["is_first_week"]
-                    ).get_context()
-
-                    week[day_time]["rows"].append(line_content)
+                    content_array = [
+                        resolved
+                        for resolved in (spec.resolve(ctx) for spec in rule.contents)
+                        if resolved is not None
+                    ]
+                    if content_array:  # Only render if we have valid content
+                        line_content = LineContent(
+                            contents=content_array, time_col=ctx["is_first_week"]
+                        ).get_context()
+                        week[day_time]["rows"].append(line_content)
+                    else:
+                        week[day_time]["rows"].append("")  # All content was invalid
                 else:
                     # Empty content
                     week[day_time]["rows"].append("")
@@ -264,7 +348,7 @@ class CalendarContextBuilder:
     def _create_context(self) -> dict:
         """Build final template context"""
         return {
-            "text": CALENDAR_TEXTS,
+            "text": CALENDAR_TEXT,
             "months": self.months,
             "legend": self._build_legend(),
         }

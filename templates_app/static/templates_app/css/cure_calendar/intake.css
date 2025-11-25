@@ -12,7 +12,7 @@
     background: var(--neutral-gray-50, #FAFAFA);
 }
 
-.product-label {
+.product-label__intake {
     color: var(--neutral-gray-700, #3A423A);
     font-size: 9pt;
     font-style: normal;
@@ -20,6 +20,10 @@
     line-height: 9pt;
     letter-spacing: -0.18pt;
     text-wrap: nowrap;
+}
+
+.product-label {
+    position:absolute
 }
 
 .intake-container {

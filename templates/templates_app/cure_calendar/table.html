@@ -3,15 +3,17 @@
 <div class="table-container">
     {% if table_header %}
         <div class="table-header">
-            {% if week.time_col %}<div class="week-content__left-corner"></div>{% endif %}
+            {% if week.display.time_column %}<div class="week-content__left-corner"></div>{% endif %}
             {% for item in text.table.header %}
-                <div class="{% if week.time_col %}table-header__cell--day-icon{% else %}table-header__cell{% endif %}">{{ item }}</div>
+                <div class="{% if week.display.time_column %}table-header__cell--day-icon{% else %}table-header__cell{% endif %}">
+                    {{ item }}
+                </div>
                 {% if forloop.counter < text.table.header|length %}<div class="table-header__vertical-line"></div>{% endif %}
             {% endfor %}
         </div>
     {% endif %}
     <div style="display: flex;">
-        {% if week.time_col and week.morning.enabled and icon == "morning" %}
+        {% if week.display.time_column and week.morning.enabled and icon == "morning" %}
             <div class="week-col__time">
                 <div class="week-content__icon-container week-col__morning-background">
                     <img class="week-content__icon week-content__icon-morning-size"
@@ -19,7 +21,7 @@
                 </div>
             </div>
         {% endif %}
-        {% if week.time_col and week.evening.enabled and icon == "evening" %}
+        {% if week.display.time_column and week.evening.enabled and icon == "evening" %}
             <div class="week-col__time">
                 <div class="week-content__icon-container week-col__evening-background">
                     <img class="week-content__icon week-content__icon-evening-size"
@@ -27,7 +29,7 @@
                 </div>
             </div>
         {% endif %}
-        {% if week.time_col and week.mixed.enabled and icon == "mixed" %}
+        {% if week.display.time_column and week.mixed.enabled and icon == "mixed" %}
             <div class="week-col__time">
                 <div class="week-content__icon-container week-col__mixed-background">
                     <img class="week-content__icon week-content__icon-mixed-size"
@@ -45,7 +47,7 @@
                     {% endif %}
                     {% with n_cell=text.table.header|length %}
                         {% for i in "0"|center:n_cell %}
-                            <div class="{% if week.time_col %}table-header__cell--day-icon{% else %}table-header__cell{% endif %}"
+                            <div class="{% if week.display.time_column %}table-header__cell--day-icon{% else %}table-header__cell{% endif %}"
                                  style="{{ cell_bg_color }}"></div>
                             {% if forloop.counter < n_cell %}<div class="table-content__vertical-line"></div>{% endif %}
                         {% endfor %}

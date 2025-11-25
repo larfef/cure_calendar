@@ -1,9 +1,9 @@
 {% load static %}
 <div class="product-container"">
-    <div class="product-label">{{ current.product.label }}</div>
+    <div class="product-label__intake">{{ product.label }}</div>
     <div class="intake-container">
-        <div class="intake-text">{{ current.product.total_daily_quantity }}x&nbsp;</div>
-        <img src="{% static '' %}{{ current.product.intake.unit_icon }}"
+        <div class="intake-text">{{ product.total_daily_quantity }}x&nbsp;</div>
+        <img src="{% static '' %}{{ product.intake.unit_icon }}"
              class="intake-icon"
              alt="Pill">
     </div>

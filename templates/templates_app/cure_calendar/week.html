@@ -3,7 +3,7 @@
     <div class="week-container_intake">
         {% if week.morning.enabled %}
             <div>
-                {% with content=week.morning.rows table_header=week.table_header icon="morning" %}
+                {% with content=week.morning.rows table_header=week.display.table_header icon="morning" %}
                     {% include "templates_app/cure_calendar/table.html" with rows=month.num_lines.morning cell_bg_color="background-color: var(--pale-yellow);" %}
                 {% endwith %}
             </div>
@@ -14,7 +14,7 @@
             <div>
                 {% with rows=week.evening.rows %}
                     {% if not week.morning.enabled %}
-                        {% with table_header=week.table_header content=week.evening.rows icon="evening" %}
+                        {% with table_header=week.display.table_header content=week.evening.rows icon="evening" %}
                             {% include "templates_app/cure_calendar/table.html" with rows=month.num_lines.evening cell_bg_color="background-color: var(--pale-blue);" %}
                         {% endwith %}
                     {% else %}
@@ -31,7 +31,7 @@
             <div>
                 {% with rows=week.mixed.rows %}
                     {% if not week.morning.enabled and not week.evening.enabled %}
-                        {% with table_header=week.table_header content=week.mixed.rows icon="mixed" %}
+                        {% with table_header=week.display.table_header content=week.mixed.rows icon="mixed" %}
                             {% include "templates_app/cure_calendar/table.html" with rows=month.num_lines.mixed cell_bg_color="background-color: var(--pale-green);" %}
                         {% endwith %}
                     {% else %}
