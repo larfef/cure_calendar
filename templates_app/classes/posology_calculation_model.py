@@ -130,6 +130,7 @@ class PosologyCalculationModel:
                     "delay": self._compute_product_delay(
                         product["phase"], product["delay"]
                     ),
+                    "base_delay": product["delay"],
                     "nutrients": product.get("nutrients"),
                     "phase": product["phase"],
                     "posology_scheme": posology_scheme,
@@ -238,6 +239,7 @@ class PosologyCalculationModel:
                 "id": product["id"],
                 "label": product["label"],
                 "delay": product["delay"],
+                "base_delay": product["base_delay"],
                 "phase": product["phase"],
                 "quantity": product["quantity"],
                 "servings": product["servings"],

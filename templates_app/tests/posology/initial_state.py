@@ -292,7 +292,7 @@ def load_products_from_yaml(yaml_path: str = "products_snapshot.yaml") -> List[D
         a5_products.append(
             {
                 "label": product["label"],
-                "delay": 0,
+                "delay": product["base_delay"],
                 "phase": product["phase"],
             }
         )
