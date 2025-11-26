@@ -43,7 +43,7 @@ def calendar(request):
             calculator = PosologyCalculationModel(
                 a5_products,
                 # cortisol_phase=random.randint(0, 1)
-                cortisol_phase=False,
+                cortisol_phase=any(p["phase"] == 1 for p in a5_products),
             )
 
             # Log products states
