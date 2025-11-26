@@ -47,7 +47,8 @@ def calendar(request):
             )
 
             # Log products states
-            write_products_to_yaml(calculator.to_dict(), "products_snapshot.yaml")
+            if not load_products_from_yaml:
+                write_products_to_yaml(calculator.to_dict(), "products_snapshot.yaml")
 
             # Initialize builder
             builder = CalendarContextBuilder(calculator)
