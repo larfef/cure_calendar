@@ -4,3 +4,4 @@ db.sqlite3
 database_state.yaml randomized_sample.yaml
 staticfiles
 logs
+products_snapshot.yaml
