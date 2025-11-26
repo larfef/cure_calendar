@@ -20,6 +20,7 @@
 
 .line-container__stop {
     position: absolute;
+    white-space: nowrap;
     color: var(--neutral-gray-700, #3A423A);
     font-size: 6pt;
     font-style: normal;
@@ -47,12 +48,12 @@
     position: absolute;
 
     color: var(--neutral-gray-700, #3A423A);
-    font-size: 8px;
+    font-size: 6pt;
     font-style: normal;
-    font-weight: 400;
-    line-height: 8px;
-    letter-spacing: -0.16px;
-    margin-top: 3px;
+    font-weight: 500;
+    line-height: 6pt;
+    letter-spacing: -0.12pt;
+    margin-top: 4px;
 }
 
 .line-arrow__green {

@@ -71,7 +71,7 @@ class ContentSpec:
 
 
 @dataclass
-class ScheduleRule:
+class Rule:
     """A rule for determining what content to add to a week"""
 
     name: str
@@ -144,8 +144,20 @@ class CalendarContextBuilder:
         """Add product schedule to appropriate time slot in week"""
         week_start = week_index * self.NB_DAY
         week_end = (week_index + 1) * self.NB_DAY
-        posology_end = product["posology_scheme"].duration_value + product["delay"]
+        posology_end = product["posology_end"]
 
+        first_unit_end = product["delay"] + product["total_daily_intakes_per_unit"]
+        if first_unit_end in range(29, 36):
+            first_unit_end = 28
+
+        second_unit_start = (
+            product["delay"]
+            + product["total_daily_intakes_per_unit"]
+            + product["pause_duration"]
+        )
+
+        if second_unit_start in range(29, 36):
+            second_unit_start = 29
         # Context with all computed values
         ctx = {
             "product": product,
@@ -157,13 +169,15 @@ class CalendarContextBuilder:
             "is_last_week": week_index % 4 == 3,
             "delay": product["delay"],
             "quantity": product["quantity"],
-            "first_unit_end": product["delay"]
-            + product["total_daily_intakes_per_unit"],
+            "first_unit_end": first_unit_end,
+            "second_unit_start": product["delay"]
+            + product["total_daily_intakes_per_unit"]
+            + product["pause_duration"],
             "pause_duration": product["pause_duration"],
         }
 
         rules = [
-            ScheduleRule(
+            Rule(
                 name="product_starts_this_week",
                 condition=lambda c: c["delay"] < c["week_end"]
                 and c["delay"] >= c["week_start"],
@@ -188,14 +202,16 @@ class CalendarContextBuilder:
                     )
                 ],
             ),
-            ScheduleRule(
+            Rule(
                 name="product_pause_between_units",
+                # Ranges [A, B] where A < B
+                # and [C, D] where C < D overlap
+                # if A < D and B > C
                 condition=lambda c: (
                     c["quantity"] > 1
-                    and (
-                        c["first_unit_end"] >= c["week_start"]
-                        or c["first_unit_end"] < c["week_end"]
-                    )
+                    and c["first_unit_end"] < c["week_end"] + 1
+                    and (c["first_unit_end"] + c["pause_duration"])
+                    > c["week_start"] + 1
                 ),
                 contents=[
                     ContentSpec(
@@ -203,7 +219,7 @@ class CalendarContextBuilder:
                         end=lambda c: c["first_unit_end"] - c["week_start"],
                         product=None,
                         text=lambda c: {
-                            "value": "Arrêter",
+                            "value": "Fin du pot 1",
                             "type": TextType.STOP_PRODUCT,
                             "enabled": True,
                         },
@@ -232,7 +248,7 @@ class CalendarContextBuilder:
                         end=7,
                         product=None,
                         text=lambda c: {
-                            "value": "Reprendre",
+                            "value": "Démarrer pot 2",
                             "type": TextType.RESTART_PRODUCT,
                             "enabled": True,
                         },
@@ -240,7 +256,26 @@ class CalendarContextBuilder:
                     ),
                 ],
             ),
-            ScheduleRule(
+            Rule(
+                name="product_restart_this_week",
+                condition=lambda c: c["quantity"] > 1
+                and c["second_unit_start"] >= c["week_start"]
+                and c["second_unit_start"] < c["week_end"],
+                contents=[
+                    ContentSpec(
+                        start=0,
+                        end=7,
+                        product=None,
+                        text=lambda c: {
+                            "value": f"{'Recommencer' if c['pause_duration'] else 'Continuer'} {c['product']['label']}",
+                            "type": TextType.RESTART_PRODUCT,
+                            "enabled": True,
+                        },
+                        type_css=lambda c: ContentType.GREEN_LINE,
+                    )
+                ],
+            ),
+            Rule(
                 name="product_continues_through_week",
                 condition=lambda c: c["posology_end"] > c["week_end"]
                 and c["delay"] < c["week_start"],
@@ -262,25 +297,28 @@ class CalendarContextBuilder:
                     )
                 ],
             ),
-            ScheduleRule(
+            Rule(
                 name="product_ends_this_week",
-                condition=lambda c: c["posology_end"] <= c["week_end"]
-                and c["posology_end"] > c["week_start"],
+                # condition=lambda c: c["posology_end"] <= c["week_end"]
+                # and c["posology_end"] > c["week_start"],
+                condition=lambda c: c["week_start"] < c["posology_end"]
+                and c["posology_end"] <= c["week_end"],
                 contents=[
                     ContentSpec(
                         start=0,
                         end=lambda c: 7 - (c["week_end"] - c["posology_end"]),
                         product=None,
                         text=lambda c: {
-                            "value": "Arrêter",
+                            "value": f"Arrêter {c['product']['label']}",
                             "type": TextType.STOP_PRODUCT,
                             "enabled": True,
                         },
                         type_css=ContentType.RED_LINE,
+                        min_width_for_text=1,
                     )
                 ],
             ),
-            # ScheduleRule(
+            # Rule(
             #     name="empty_slot_same_month",
             #     condition=lambda c: (
             #         (c["week_end"] // (self.MONTH_DAY + 1))
@@ -288,10 +326,15 @@ class CalendarContextBuilder:
             #     ),
             #     contents=[],  # Empty content array
             # ),
-            ScheduleRule(
+            Rule(
                 name="product_not_started",
                 condition=lambda c: c["delay"] >= c["week_end"],
                 contents=[],  # Empty content array
+            ),
+            Rule(
+                name="product already ended",
+                condition=lambda c: c["posology_end"] < c["week_start"],
+                contents=[],
             ),
         ]
 
@@ -330,6 +373,15 @@ class CalendarContextBuilder:
                 len(week[time_slot]["rows"]) for week in month["weeks"]
             )
         pass
+
+    # def _update_month_line_counts(self, month_index: int) -> None:
+    # """Update maximum line counts for each time slot in month"""
+    # month = self.months[month_index]
+    # for time_slot in DAY_TIME_SLOTS:
+    #     month["num_lines"][time_slot] = max(
+    #         sum(1 for item in week[time_slot]["rows"] if item != "")
+    #         for week in month["weeks"]
+    #     )
 
     def _update_week_enabled_slots(self, week: WeekSchedule, month_index: int) -> None:
         """Enable/disable time slots based on content"""

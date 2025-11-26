@@ -1,5 +1,7 @@
 import math
 from typing import Dict, List, Union
+
+from django.utils.html import strip_tags
 from templates_app.constants.posology_constants import (
     DELAY_RULES,
     MULTIPLE_PRODUCT_UNIT_RULES,
@@ -9,7 +11,7 @@ from templates_app.types.product import A5Product, AdaptedA5Product
 
 
 CORTISOL_PHASE_DURATION_DAYS = 28
-MAX_DAYS_BETWEEN_PRODUCT_UNIT = 16
+MAX_DAYS_BETWEEN_PRODUCT_UNIT = 28
 
 
 def adapter_a5_product(products: List[A5Product]) -> List[AdaptedA5Product]:
@@ -120,17 +122,14 @@ class PosologyCalculationModel:
                 product["servings"] / total_daily_quantity
             )
 
-            new_delay = self._compute_product_delay(product["id"], product["phase"])
-
             # Store normalized product with pre-computed values
             normalized.append(
                 {
                     "id": product["id"],
-                    "label": product["label"],
-                    "delay": product["delay"]
-                    if not new_delay
-                    else new_delay
-                    + self.cortisol_phase_duration * (product["phase"] == 2),
+                    "label": strip_tags(product["label"]),
+                    "delay": self._compute_product_delay(
+                        product["phase"], product["delay"]
+                    ),
                     "nutrients": product.get("nutrients"),
                     "phase": product["phase"],
                     "posology_scheme": posology_scheme,
@@ -138,31 +137,36 @@ class PosologyCalculationModel:
                     "intake": posology_scheme.intakes.first(),
                     "total_daily_quantity": total_daily_quantity,
                     "total_daily_intakes_per_unit": total_daily_intakes_per_unit,
+                    "quantity": 2
+                    if self._product_second_unit(
+                        product["id"], product["phase"], product["delay"], products
+                    )
+                    else 1,
                 }
             )
             normalized.sort(key=lambda p: p["delay"])
 
         for dict in normalized:
+            # quantity = 1
+            # if self._product_second_unit(
+            #     dict["id"], dict["phase"], dict["delay"], normalized
+            # ):
+            #     quantity = 2
             dict.update(
                 {
-                    "quantity": 1
-                    if not self._product_second_unit(
-                        dict["id"], dict["phase"], dict["delay"], normalized
-                    )
-                    else 2,
                     "pause_duration": self.get_pause_between_product_unit(dict),
+                    "posology_end": dict["total_daily_intakes_per_unit"]
+                    * dict["quantity"]
+                    + dict["delay"]
+                    + self.get_pause_between_product_unit(dict),
                 }
             )
         return normalized
 
-    def _compute_product_delay(self, id: int, phase: int):
+    def _compute_product_delay(self, phase: int, delay: int):
         new_delay = DELAY_RULES[self.cortisol_phase].get("id")
         if not new_delay:
-            return None
-
-        if self.cortisol_phase_duration and phase == 2:
-            new_delay += self.cortisol_phase_duration
-
+            return delay + self.cortisol_phase_duration * (phase == 2)
         return new_delay
 
     def _product_second_unit_exceptions(self, id: int, delay: int, products: list):
@@ -177,7 +181,7 @@ class PosologyCalculationModel:
             return self._product_second_unit_exceptions(id, delay, products)
 
         # When product id is in always list
-        # It means there is always a second product item
+        # It means there is always a second product unit
         return id in MULTIPLE_PRODUCT_UNIT_RULES[self.cortisol_phase][phase]["always"]
 
     def get_microbiote_phase_start(self):
@@ -195,33 +199,35 @@ class PosologyCalculationModel:
     def get_microbiote_phase_end(self):
         max_product = max(
             self.products,
-            key=lambda p: p["delay"] + p["posology_scheme"].duration_value,
+            key=lambda p: p["posology_end"],
         )
-        return max_product["delay"] + max_product["posology_scheme"].duration_value
+        return max_product["posology_end"]
 
     def get_total_daily_intakes_per_product_unit(self, product):
         return product["servings"] / product["total_daily_quantity"]
 
     def get_pause_between_product_unit(self, product: AdaptedA5Product):
-        # if not self.cortisol_phase_duration:
-        #     return 0
+        # No pause if there is only one product unit
+        if product["quantity"] == 1:
+            return 0
 
         total_daily_intakes = self.get_total_daily_intakes_per_product_unit(product)
 
         if total_daily_intakes > MAX_DAYS_BETWEEN_PRODUCT_UNIT:
             return 0
 
-        if product["posology_scheme"].duration_value <= total_daily_intakes:
-            return 0
+        # if product["posology_scheme"].duration_value <= total_daily_intakes:
+        #     return 0
 
         return int(MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes)
 
-    def get_product_units_per_posology_scheme(self, product: AdaptedA5Product):
-        return math.ceil(
-            product["total_daily_quantity"]
-            * product["posology_scheme"].duration_value
-            / product["servings"]
-        )
+    # Not used anymore
+    # def get_product_units_per_posology_scheme(self, product: AdaptedA5Product):
+    #     return math.ceil(
+    #         product["total_daily_quantity"]
+    #         * product["posology_scheme"].duration_value
+    #         / product["servings"]
+    #     )
 
     def to_dict(self):
         """Return a serializable dictionary representation of products."""
@@ -237,6 +243,7 @@ class PosologyCalculationModel:
                 "servings": product["servings"],
                 "total_daily_quantity": product["total_daily_quantity"],
                 "total_daily_intakes_per_unit": product["total_daily_intakes_per_unit"],
+                "pause_duration": product["pause_duration"],
             }
 
             if product.get("nutrients"):

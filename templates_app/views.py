@@ -13,9 +13,11 @@ from templates_app.classes.line_content import (
     TextType,
 )
 from templates_app.tests.posology.initial_state import (
+    load_products_from_yaml,
     populate_database,
     create_mock_a5_product,
     labels,
+    products,
 )
 from templates_app.utils.pdf_generator import generate_pdf_from_url
 
@@ -26,20 +28,22 @@ def calendar(request):
             # Initial db state
             populate_database()
 
-            # Create mock products
-            a5_products = [
-                # create_mock_a5_product(labels[v][0])
-                # for v in random.sample(
-                #     range(0, len(labels)), random.randint(4, len(labels))
-                # )
-                # for v in random.sample(range(0, len(labels)), 6)
-                create_mock_a5_product(labels[8][0])
-            ]
+            # Check if we should load from YAML or generate random
+            load_from_yaml = request.GET.get("load_snapshot", "false").lower() == "true"
+
+            if load_from_yaml:
+                a5_products = load_products_from_yaml("products_snapshot.yaml")
+            else:
+                a5_products = [
+                    create_mock_a5_product(labels[v][0])
+                    for v in random.sample(range(0, len(labels)), random.randint(5, 7))
+                ]
 
             # Compute states common to products
             calculator = PosologyCalculationModel(
                 a5_products,
                 # cortisol_phase=random.randint(0, 1)
+                cortisol_phase=False,
             )
 
             # Log products states
@@ -63,7 +67,18 @@ def calendar(request):
 
 def calendar_pdf(request):
     """Generate and display PDF of the cure calendar in browser"""
-    calendar_url = request.build_absolute_uri("/calendar")
+    from urllib.parse import urlencode
+
+    # Extract all GET parameters from the request except those for this view (if any)
+    query_params = request.GET.copy()
+    # Remove any params you do NOT want forwarded, e.g. for /calendar_pdf only
+    # query_params.pop("some_param", None)
+
+    base_url = request.build_absolute_uri("/calendar")
+    if query_params:
+        calendar_url = f"{base_url}?{urlencode(query_params)}"
+    else:
+        calendar_url = base_url
 
     try:
         pdf_bytes = generate_pdf_from_url(calendar_url)
