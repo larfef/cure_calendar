@@ -7,6 +7,8 @@ from pathlib import Path
 import yaml
 from typing import List, Dict
 
+from templates_app.types.product import ProductsData
+
 # Label, Id, Servings, Duration Value, Quantity, Frequency
 
 MOCK_PRODUCTS = {
@@ -235,30 +237,35 @@ def populate_database():
         )
 
 
-def load_products_from_yaml(yaml_path: str = "products_snapshot.yaml") -> List[Dict]:
+def load_products_from_yaml(yaml_path: str = "products_snapshot.yaml") -> ProductsData:
     """
-    Load products from YAML file and convert back to A5Product format.
+    Load products from YAML file and reconstruct ProductsData structure.
 
-    Returns a list of A5Products with label, delay, and phase fields
-    that can be passed to PosologyCalculationModel.
+    Returns ProductsData TypedDict with:
+        - products: Dict[int, Product] - Django Product instances fetched from DB
+        - delays: Dict[int, int] - Delay for each product
+        - cortisol_phase: bool - Whether cortisol phase is active
     """
+    from templates_app.models.product import Product
+    from templates_app.types.product import ProductsData
+
     yaml_file = Path(yaml_path)
 
     if not yaml_file.exists():
         raise FileNotFoundError(f"YAML file not found: {yaml_path}")
 
     with yaml_file.open("r", encoding="utf-8") as f:
-        products_data = yaml.safe_load(f)
+        data = yaml.safe_load(f)
 
-    # Convert back to A5Product format (minimal fields needed)
-    a5_products = []
-    for product in products_data:
-        a5_products.append(
-            {
-                "label": product["label"],
-                "delay": product["base_delay"],
-                "phase": product["phase"],
-            }
-        )
+    # Reconstruct ProductsData structure
+    products_data: ProductsData = {
+        "products": {},
+        "delays": data["delays"],
+        "cortisol_phase": data["cortisol_phase"],
+    }
 
-    return a5_products
+    # Fetch Product instances from database
+    for product_id in data["product_ids"]:
+        products_data["products"][product_id] = Product.objects.get(id=product_id)
+
+    return products_data

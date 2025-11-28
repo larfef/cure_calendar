@@ -275,7 +275,7 @@ class CalendarContextBuilder:
                         end=7,
                         product=None,
                         text=lambda c: {
-                            "value": f"{'Recommencer' if c['pause_between_unit'] else 'Continuer'} {c['product']['label']}",
+                            "value": f"{'Recommencer' if c['pause_between_unit'] else 'Continuer'} {product['label']}",
                             "type": TextType.RESTART_PRODUCT,
                             "enabled": True,
                         },

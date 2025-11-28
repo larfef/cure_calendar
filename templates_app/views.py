@@ -38,15 +38,16 @@ def calendar(request):
             load_from_yaml = request.GET.get("load_snapshot", "false").lower() == "true"
 
             if load_from_yaml:
-                products = load_products_from_yaml("products_snapshot.yaml")
+                products_data = load_products_from_yaml("products_snapshot.yaml")
             else:
-                sample = random.randint(1, 6)
+                # sample = random.randint(1, 6)
+                sample = 2
                 sample_dict = dict(random.sample(list(MOCK_PRODUCTS.items()), sample))
 
                 products_data: ProductsData = {
                     "products": {},
                     "delays": {},
-                    "cortisol_phase": False,
+                    "cortisol_phase": True,
                 }
 
                 for k, v in sample_dict.items():
@@ -65,13 +66,13 @@ def calendar(request):
             # # Compute states common to products
             calculator = PosologyCalculationModel(
                 normalized_products,
-                # cortisol_phase=random.randint(0, 1)
-                cortisol_phase=any(p["phase"] == 1 for p in normalized_products),
+                cortisol_phase=products_data["cortisol_phase"],
+                # cortisol_phase=any(p["phase"] == 1 for p in normalized_products),
             )
 
             # Log products states
-            # if not load_from_yaml:
-            #     write_products_to_yaml(calculator.to_dict(), "products_snapshot.yaml")
+            if not load_from_yaml:
+                write_products_to_yaml(products_data, "products_snapshot.yaml")
 
             # Initialize builder
             builder = CalendarContextBuilder(
