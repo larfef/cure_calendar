@@ -12,7 +12,7 @@
     background: var(--neutral-gray-50, #FAFAFA);
 }
 
-.product-label__intake {
+.product-label {
     color: var(--neutral-gray-700, #3A423A);
     font-size: 9pt;
     font-style: normal;
@@ -22,11 +22,11 @@
     text-wrap: nowrap;
 }
 
-.product-label {
+.product-label--layout {
     position:absolute
 }
 
-.intake-container {
+.product__intake {
     display: flex;
     flex-shrink: 0;
     padding: 1pt 3pt;

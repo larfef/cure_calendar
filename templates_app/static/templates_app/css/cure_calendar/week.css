@@ -1,3 +1,9 @@
+.week-outer-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6pt;
+}
+
 .week-container {
     display: flex;
     flex-direction: column;
@@ -60,4 +66,13 @@
     align-self: stretch;
     display: flex;
     flex-direction: column;
+}
+
+.week-number__text {
+    color: var(--Neutral-Gray-700, #3A423A);
+    font-size: 8pt;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 8pt;
+    letter-spacing: -0.16px;
 }
