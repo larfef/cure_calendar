@@ -1,7 +1,8 @@
-from typing import List, Union, TypedDict
+from typing import Dict, List, Union, TypedDict
 from django.db.models.query import QuerySet
 from templates_app.models.posology_scheme import PosologyScheme
 from templates_app.models.posology_intake import PosologyIntake
+from templates_app.models.product import Product
 
 
 class NutrientDict(TypedDict):
@@ -16,13 +17,10 @@ class AdaptedA5Product(TypedDict):
     posology: Union[QuerySet[PosologyScheme]]
 
 
-class A5Product(TypedDict):
-    nutrients: List[NutrientDict] | None
-    label: str
-    posology: str | None
-    duration: str | None
-    delay: int
-    phase: int
+class ProductsData(TypedDict):
+    products: Dict[int, Product]
+    delays: Dict[int, int]
+    cortisol_phase: bool
 
 
 class NormalizedProduct(TypedDict):
@@ -30,12 +28,16 @@ class NormalizedProduct(TypedDict):
 
     id: int
     label: str
-    delay: int  # Computed delay considering phase and cortisol timing
-    nutrients: List[NutrientDict] | None
-    phase: int  # Product phase (1 or 2)
-    posology_scheme: PosologyScheme  # The selected posology scheme
-    servings: int  # Total servings in product package
-    intake: PosologyIntake  # First intake from the scheme
-    total_daily_quantity: int | float  # Total quantity per day
-    total_daily_intakes_per_unit: int  # How many days one unit lasts
-    quantity: int  # Number of product units needed (1 or 2)
+    phase: int
+    posology: PosologyScheme
+    base_delay: int
+    servings: int
+    intake: PosologyIntake
+    total_daily_quantity: int | float
+    total_daily_intakes_per_unit: int
+    first_unit_start: int
+    first_unit_end: int
+    second_unit: bool  # Whether there is a second unit in the protocol
+    second_unit_start: int
+    pause_between_unit: int
+    posology_end: int

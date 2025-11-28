@@ -1,49 +1,164 @@
-import math
 from typing import Dict, List, Union
 
-from django.utils.html import strip_tags
 from templates_app.constants.posology_constants import (
     DELAY_RULES,
+    MAX_STARTING_DAYS,
     MULTIPLE_PRODUCT_UNIT_RULES,
 )
 from templates_app.models.product import Product
-from templates_app.types.product import A5Product, AdaptedA5Product
+from templates_app.types.product import (
+    AdaptedA5Product,
+    NormalizedProduct,
+    ProductsData,
+)
 
 
 CORTISOL_PHASE_DURATION_DAYS = 28
 MAX_DAYS_BETWEEN_PRODUCT_UNIT = 28
 
 
-def adapter_a5_product(products: List[A5Product]) -> List[AdaptedA5Product]:
-    """Convert A5Product to AdaptedA5Product by fetching posology schemes from DB."""
-    product_labels = [product["label"] for product in products]
-
-    # Create dict mapping label -> Product instance (for lookup)
-    product_lookup = {
-        v.label: v
-        for v in Product.objects.filter(label__in=product_labels).prefetch_related(
-            "posology_schemes"
+def _validate_and_get_posology_scheme(product: Product):
+    """Validate and return the first posology scheme."""
+    posology_scheme = product.posology_schemes.first()
+    if not posology_scheme:
+        raise ProductValidationError(
+            f"Product '{product.label}' has no posology schemes"
         )
-    }
 
-    new_products: List[AdaptedA5Product] = []
-    for product in products:
-        adapted_product = product_lookup.get(product["label"])
+    if not posology_scheme.duration_value or posology_scheme.duration_value <= 0:
+        raise ProductValidationError(
+            f"Product '{product.label}' has invalid duration: "
+            f"{posology_scheme.duration_value}"
+        )
 
-        if adapted_product:
-            new_products.append(
-                {
-                    "id": adapted_product.id,
-                    "label": product["label"],
-                    "nutrients": product.get("nutrients"),
-                    "posology": adapted_product.posology_schemes.all(),  # QuerySet
-                    "servings": adapted_product.servings,
-                    "delay": product["delay"],
-                    "phase": product["phase"],
-                }
+    return posology_scheme
+
+
+def _validate_and_get_daily_quantity(product: Product, posology_scheme) -> float:
+    """Validate and return total daily quantity."""
+    total_daily_quantity = posology_scheme.get_total_daily_quantity()
+    if not total_daily_quantity or total_daily_quantity <= 0:
+        raise ProductValidationError(
+            f"Product '{product.label}' has invalid total daily quantity: "
+            f"{total_daily_quantity}"
+        )
+    return total_daily_quantity
+
+
+def _validate_servings(product: Product):
+    """Validate product servings."""
+    if product.servings <= 0:
+        raise ProductValidationError(
+            f"Product '{product.label}' has invalid servings: {product.servings}"
+        )
+
+
+def adapter_products_data_normalized(
+    products_data: ProductsData,
+    cortisol_phase_duration: int = CORTISOL_PHASE_DURATION_DAYS,
+) -> List[NormalizedProduct]:
+    """
+    Convert Product dict directly to normalized products in one pass.
+    Combines adapter + normalization logic to avoid intermediate format.
+
+    Args:
+        product_dict: {product_id: Product} - Product objects already prefetched
+        product_delays: {product_id: delay_value}
+        cortisol_phase: Whether cortisol phase is active
+        cortisol_phase_duration: Duration of cortisol phase
+
+    Returns:
+        List of fully normalized products ready for use
+    """
+    from django.utils.html import strip_tags
+
+    normalized = []
+    products_list = list(products_data.get("products").values())
+
+    for product in products_list:
+        # Validate and extract data in one pass
+        posology_scheme = _validate_and_get_posology_scheme(product)
+        total_daily_quantity = _validate_and_get_daily_quantity(
+            product, posology_scheme
+        )
+        _validate_servings(product)
+
+        # Compute delay (with cortisol phase consideration)
+        base_delay = products_data.get("delays").get(product.id, 0)
+        computed_delay = base_delay
+        if products_data.get("cortisol_phase"):
+            new_delay = DELAY_RULES[products_data.get("cortisol_phase")].get("id")
+            if new_delay:
+                computed_delay = new_delay
+            else:
+                computed_delay = base_delay + cortisol_phase_duration * (
+                    product.phase == 2
+                )
+
+        second_unit = (
+            product._has_exception(
+                rule=lambda p: p in MULTIPLE_PRODUCT_UNIT_RULES["exceptions"]
             )
+            and (
+                product.id == 13
+                and not any(other.id == 25 for other in products_list)
+                or not products_data.get("cortisol_phase")
+                and not products_data.get("delays")[product.id]
+            )
+            or product._has_second_unit(
+                rule=lambda p: p
+                in MULTIPLE_PRODUCT_UNIT_RULES[products_data.get("cortisol_phase")][
+                    product.phase
+                ]["always"]
+            )
+        )
 
-    return new_products
+        total_daily_intakes_per_unit = int(product.servings / total_daily_quantity)
+
+        pause_between_unit = (
+            int(MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes_per_unit)
+            if total_daily_intakes_per_unit < MAX_STARTING_DAYS
+            else 0
+        )
+
+        first_unit_end = computed_delay + total_daily_intakes_per_unit
+        if first_unit_end in range(29, 36):
+            first_unit_end = 28
+
+        second_unit_start = (
+            computed_delay + pause_between_unit + total_daily_intakes_per_unit
+        )
+
+        if second_unit_start in range(29, 36):
+            second_unit_start = 29
+
+        normalized.append(
+            {
+                "id": product.id,
+                "label": strip_tags(product.label),
+                "phase": product.phase,
+                "posology": posology_scheme,
+                "base_delay": base_delay,
+                "servings": product.servings,
+                "intake": posology_scheme.intakes.first(),
+                "total_daily_quantity": total_daily_quantity,
+                "total_daily_intakes_per_unit": total_daily_intakes_per_unit,
+                "first_unit_start": computed_delay,
+                "first_unit_end": first_unit_end,
+                "second_unit": second_unit,
+                "second_unit_start": computed_delay
+                + pause_between_unit
+                + total_daily_intakes_per_unit,
+                "pause_between_unit": pause_between_unit,
+                "posology_end": total_daily_intakes_per_unit * (second_unit + 1)
+                + computed_delay
+                + pause_between_unit,
+            }
+        )
+
+    # Sort by delay
+    normalized.sort(key=lambda p: p["first_unit_start"])
+    return normalized
 
 
 class ProductValidationError(Exception):
@@ -55,114 +170,37 @@ class ProductValidationError(Exception):
 class PosologyCalculationModel:
     def __init__(
         self,
-        products: Union[List[A5Product], List[AdaptedA5Product]],
+        products: List[NormalizedProduct],
         cortisol_phase: bool = False,
         cortisol_phase_duration: int = CORTISOL_PHASE_DURATION_DAYS,
-        adapted: bool = False,
     ):
         if not products:
             raise ValueError("products cannot be None or empty")
 
-        # Convert A5Product → AdaptedA5Product
-        if not adapted:
-            raw_products = adapter_a5_product(products)
-        else:
-            raw_products = products
-
+        self.products = products
         self.cortisol_phase = cortisol_phase
         self.cortisol_phase_duration = cortisol_phase_duration * cortisol_phase
-        # Validate and normalize products
-        self.products = self._validate_and_normalize_products(raw_products)
 
-    def _validate_and_normalize_products(self, products: Dict) -> Dict:
-        """Validate and normalize product data"""
-        normalized = []
+    def get_microbiote_phase_start(self):
+        if self.cortisol_phase_duration > 0:
+            # If there's a cortisol phase, find min delay among phase 2 products
+            return min(
+                (p for p in self.products if p["phase"] == 2),
+                key=lambda p: p["first_unit_start"],
+                default=min(self.products, key=lambda p: p["first_unit_start"]),
+            )["first_unit_start"]
+        else:
+            # No cortisol phase, find min first_unit_start among all products
+            return min(self.products, key=lambda p: p["first_unit_start"])[
+                "first_unit_start"
+            ]
 
-        for product in products:
-            # Validate required fields
-            if "delay" not in product:
-                raise ProductValidationError(
-                    f"Product '{product['label']}' missing 'delay' field"
-                )
-
-            if "servings" not in product:
-                raise ProductValidationError(
-                    f"Product '{product['label']}' missing or invalid 'servings'"
-                )
-
-            if product["servings"] <= 0:
-                raise ProductValidationError(
-                    f"Product '{product['label']}' has invalid servings : {product['label']}"
-                )
-
-            # Validate and extract posology scheme
-            posology_scheme = product.get("posology").first()
-            if not posology_scheme:
-                raise ProductValidationError(
-                    f"Product '{product['label']}' has no posology schemes"
-                )
-
-            # Validate duration
-            if (
-                not posology_scheme.duration_value
-                or posology_scheme.duration_value <= 0
-            ):
-                raise ProductValidationError(
-                    f"Product '{product['label']}' has invalid duration: {posology_scheme.duration_value}"
-                )
-
-            # Validate total daily quantity
-            total_daily_quantity = posology_scheme.get_total_daily_quantity()
-            if not total_daily_quantity or total_daily_quantity <= 0:
-                raise ProductValidationError(
-                    f"Product '{product['label']}' has invalid total daily quantity: {total_daily_quantity}"
-                )
-
-            total_daily_intakes_per_unit = int(
-                product["servings"] / total_daily_quantity
-            )
-
-            # Store normalized product with pre-computed values
-            normalized.append(
-                {
-                    "id": product["id"],
-                    "label": strip_tags(product["label"]),
-                    "delay": self._compute_product_delay(
-                        product["phase"], product["delay"]
-                    ),
-                    "base_delay": product["delay"],
-                    "nutrients": product.get("nutrients"),
-                    "phase": product["phase"],
-                    "posology_scheme": posology_scheme,
-                    "servings": product["servings"],
-                    "intake": posology_scheme.intakes.first(),
-                    "total_daily_quantity": total_daily_quantity,
-                    "total_daily_intakes_per_unit": total_daily_intakes_per_unit,
-                    "quantity": 2
-                    if self._product_second_unit(
-                        product["id"], product["phase"], product["delay"], products
-                    )
-                    else 1,
-                }
-            )
-            normalized.sort(key=lambda p: p["delay"])
-
-        for dict in normalized:
-            # quantity = 1
-            # if self._product_second_unit(
-            #     dict["id"], dict["phase"], dict["delay"], normalized
-            # ):
-            #     quantity = 2
-            dict.update(
-                {
-                    "pause_duration": self.get_pause_between_product_unit(dict),
-                    "posology_end": dict["total_daily_intakes_per_unit"]
-                    * dict["quantity"]
-                    + dict["delay"]
-                    + self.get_pause_between_product_unit(dict),
-                }
-            )
-        return normalized
+    def get_microbiote_phase_end(self):
+        max_product = max(
+            self.products,
+            key=lambda p: p["posology_end"],
+        )
+        return max_product["posology_end"]
 
     def _compute_product_delay(self, phase: int, delay: int):
         new_delay = DELAY_RULES[self.cortisol_phase].get("id")
@@ -185,50 +223,17 @@ class PosologyCalculationModel:
         # It means there is always a second product unit
         return id in MULTIPLE_PRODUCT_UNIT_RULES[self.cortisol_phase][phase]["always"]
 
-    def get_microbiote_phase_start(self):
-        if self.cortisol_phase_duration > 0:
-            # If there's a cortisol phase, find min delay among phase 2 products
-            return min(
-                (p for p in self.products if p["phase"] == 2),
-                key=lambda p: p["delay"],
-                default=min(self.products, key=lambda p: p["delay"]),
-            )["delay"]
-        else:
-            # No cortisol phase, find min delay among all products
-            return min(self.products, key=lambda p: p["delay"])["delay"]
+    # def get_pause_between_product_unit(self, product: AdaptedA5Product):
+    #     # No pause if there is only one product unit
+    #     if not product["has_second_unit"]:
+    #         return 0
 
-    def get_microbiote_phase_end(self):
-        max_product = max(
-            self.products,
-            key=lambda p: p["posology_end"],
-        )
-        return max_product["posology_end"]
+    #     total_daily_intakes = self.get_total_daily_intakes_per_product_unit(product)
 
-    def get_total_daily_intakes_per_product_unit(self, product):
-        return product["servings"] / product["total_daily_quantity"]
+    #     if total_daily_intakes > MAX_DAYS_BETWEEN_PRODUCT_UNIT:
+    #         return 0
 
-    def get_pause_between_product_unit(self, product: AdaptedA5Product):
-        # No pause if there is only one product unit
-        if product["quantity"] == 1:
-            return 0
-
-        total_daily_intakes = self.get_total_daily_intakes_per_product_unit(product)
-
-        if total_daily_intakes > MAX_DAYS_BETWEEN_PRODUCT_UNIT:
-            return 0
-
-        # if product["posology_scheme"].duration_value <= total_daily_intakes:
-        #     return 0
-
-        return int(MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes)
-
-    # Not used anymore
-    # def get_product_units_per_posology_scheme(self, product: AdaptedA5Product):
-    #     return math.ceil(
-    #         product["total_daily_quantity"]
-    #         * product["posology_scheme"].duration_value
-    #         / product["servings"]
-    #     )
+    #     return int(MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes)
 
     def to_dict(self):
         """Return a serializable dictionary representation of products."""

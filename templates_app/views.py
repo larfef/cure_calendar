@@ -1,9 +1,15 @@
+from calendar import HTMLCalendar
+from http.client import HTTPResponse
 import random
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
 from templates_app.classes.calendar_context_builder import CalendarContextBuilder
-from templates_app.classes.posology_calculation_model import PosologyCalculationModel
+from templates_app.classes.posology_calculation_model import (
+    CORTISOL_PHASE_DURATION_DAYS,
+    PosologyCalculationModel,
+    adapter_products_data_normalized,
+)
 from templates_app.constants.calendar_constants import CALENDAR_TEXT
 from templates_app.logging.yaml_writer import write_products_to_yaml
 from templates_app.classes.line_content import (
@@ -12,13 +18,13 @@ from templates_app.classes.line_content import (
     LineContent,
     TextType,
 )
+from templates_app.models.product import Product
 from templates_app.tests.posology.initial_state import (
     load_products_from_yaml,
     populate_database,
-    create_mock_a5_product,
-    labels,
-    products,
+    MOCK_PRODUCTS,
 )
+from templates_app.types.product import ProductsData
 from templates_app.utils.pdf_generator import generate_pdf_from_url
 
 
@@ -32,34 +38,55 @@ def calendar(request):
             load_from_yaml = request.GET.get("load_snapshot", "false").lower() == "true"
 
             if load_from_yaml:
-                a5_products = load_products_from_yaml("products_snapshot.yaml")
+                products = load_products_from_yaml("products_snapshot.yaml")
             else:
-                a5_products = [
-                    create_mock_a5_product(labels[v][0])
-                    for v in random.sample(range(0, len(labels)), random.randint(5, 7))
-                ]
+                sample = random.randint(1, 6)
+                sample_dict = dict(random.sample(list(MOCK_PRODUCTS.items()), sample))
 
-            # Compute states common to products
+                products_data: ProductsData = {
+                    "products": {},
+                    "delays": {},
+                    "cortisol_phase": False,
+                }
+
+                for k, v in sample_dict.items():
+                    product_id = v["id"]
+                    products_data["products"][product_id] = Product.objects.get(
+                        id=product_id
+                    )
+                    products_data["delays"][product_id] = (
+                        0  # or random.randint(0, 7) or whatever logic you need
+                    )
+
+            normalized_products = adapter_products_data_normalized(
+                products_data,
+            )
+
+            # # Compute states common to products
             calculator = PosologyCalculationModel(
-                a5_products,
+                normalized_products,
                 # cortisol_phase=random.randint(0, 1)
-                cortisol_phase=any(p["phase"] == 1 for p in a5_products),
+                cortisol_phase=any(p["phase"] == 1 for p in normalized_products),
             )
 
             # Log products states
-            if not load_from_yaml:
-                write_products_to_yaml(calculator.to_dict(), "products_snapshot.yaml")
+            # if not load_from_yaml:
+            #     write_products_to_yaml(calculator.to_dict(), "products_snapshot.yaml")
 
             # Initialize builder
-            builder = CalendarContextBuilder(calculator)
+            builder = CalendarContextBuilder(
+                calculator=calculator, products=normalized_products
+            )
 
             context = builder.build()
+            pass
 
             response = render(
                 request, "templates_app/cure_calendar/calendar.html", context
             )
             transaction.set_rollback(True)
             return response
+            # return HttpResponse(status=200)
 
     except Exception as e:
         # If something goes wrong, transaction automatically rolls back

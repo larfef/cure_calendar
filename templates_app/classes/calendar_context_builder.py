@@ -79,18 +79,29 @@ class Rule:
     contents: list[ContentSpec]  # Returns list[ContentDict]
 
 
+@dataclass
 class CalendarContextBuilder:
     """Builds calendar context for template rendering"""
 
     NB_DAY = 7
     MONTH_DAY = 4 * NB_DAY
 
-    def __init__(self, calculator: PosologyCalculationModel):
-        self.calculator = calculator
-        self.months: list[MonthSummary] = []
+    calculator: PosologyCalculationModel
+    products: NormalizedProduct
+    # months: list[MonthSummary] = []
+
+    # def __init__(
+    #     self, products: NormalizedProduct, calculator: PosologyCalculationModel
+    # ):
+    #     self.calculator = calculator
+    #     self.products = products
+    #     self.months: list[MonthSummary] = []
 
     def build(self) -> dict:
         """Main entry point - builds complete calendar context"""
+
+        self.months: list[MonthSummary] = []
+
         total_weeks = math.ceil(
             self.calculator.get_microbiote_phase_end() / self.NB_DAY
         )
@@ -114,7 +125,7 @@ class CalendarContextBuilder:
         )
 
         # Add content for each product
-        for product in self.calculator.products:
+        for product in self.products:
             self._add_product_to_week(product, week, week_index)
 
         # Add week to month
@@ -144,57 +155,50 @@ class CalendarContextBuilder:
         """Add product schedule to appropriate time slot in week"""
         week_start = week_index * self.NB_DAY
         week_end = (week_index + 1) * self.NB_DAY
-        posology_end = product["posology_end"]
 
-        first_unit_end = product["delay"] + product["total_daily_intakes_per_unit"]
-        if first_unit_end in range(29, 36):
-            first_unit_end = 28
-
-        second_unit_start = (
-            product["delay"]
-            + product["total_daily_intakes_per_unit"]
-            + product["pause_duration"]
-        )
-
-        if second_unit_start in range(29, 36):
-            second_unit_start = 29
         # Context with all computed values
+        # ctx = {
+        #     "product": product,
+        #     "week_index": week_index,
+        #     "week_start": week_start,
+        #     "week_end": week_end,
+        #     "posology_end": posology_end,
+        #     "is_first_week": week_index % 4 == 0,
+        #     "is_last_week": week_index % 4 == 3,
+        #     "delay": product["delay"],
+        #     "quantity": product["quantity"],
+        #     "first_unit_end": first_unit_end,
+        #     "second_unit_start": product["delay"]
+        #     + product["total_daily_intakes_per_unit"]
+        #     + product["pause_duration"],
+        #     "pause_duration": product["pause_duration"],
+        # }
+
         ctx = {
-            "product": product,
+            **product,
             "week_index": week_index,
             "week_start": week_start,
             "week_end": week_end,
-            "posology_end": posology_end,
             "is_first_week": week_index % 4 == 0,
             "is_last_week": week_index % 4 == 3,
-            "delay": product["delay"],
-            "quantity": product["quantity"],
-            "first_unit_end": first_unit_end,
-            "second_unit_start": product["delay"]
-            + product["total_daily_intakes_per_unit"]
-            + product["pause_duration"],
-            "pause_duration": product["pause_duration"],
         }
 
         rules = [
             Rule(
                 name="product_starts_this_week",
-                condition=lambda c: c["delay"] < c["week_end"]
-                and c["delay"] >= c["week_start"],
+                condition=lambda c: c["first_unit_start"] < c["week_end"]
+                and c["first_unit_start"] >= c["week_start"],
                 contents=[
                     ContentSpec(
                         start=lambda c: (
-                            c["delay"] - c["week_start"]
-                            if (c["delay"] > 28 or c["delay"] < 22)
+                            c["first_unit_start"] - c["week_start"]
+                            if (
+                                c["first_unit_start"] > 28 or c["first_unit_start"] < 22
+                            )
                             else 0
                         ),
                         end=7,
-                        product=lambda c: c["product"],
-                        # text=lambda c: {
-                        #     "value": c["product"]["label"],
-                        #     "type": TextType.PRODUCT_LABEL,
-                        #     "enabled": c["is_first_week"],
-                        # },
+                        product=product,
                         text=None,
                         type_css=lambda c: ContentType.ARROW
                         if c["is_last_week"]
@@ -208,14 +212,14 @@ class CalendarContextBuilder:
                 # and [C, D] where C < D overlap
                 # if A < D and B > C
                 condition=lambda c: (
-                    c["quantity"] > 1
+                    c["second_unit"]
                     and c["first_unit_end"] < c["week_end"] + 1
-                    and (c["first_unit_end"] + c["pause_duration"])
+                    and (c["first_unit_end"] + c["pause_between_unit"])
                     > c["week_start"] + 1
                 ),
                 contents=[
                     ContentSpec(
-                        start=lambda c: max(0, c["delay"] - c["week_start"]),
+                        start=lambda c: max(0, c["first_unit_start"] - c["week_start"]),
                         end=lambda c: c["first_unit_end"] - c["week_start"],
                         product=None,
                         text=lambda c: {
@@ -230,7 +234,9 @@ class CalendarContextBuilder:
                         start=lambda c: max(0, c["first_unit_end"] - c["week_start"]),
                         end=lambda c: min(
                             7,
-                            c["first_unit_end"] - c["week_start"] + c["pause_duration"],
+                            c["first_unit_end"]
+                            - c["week_start"]
+                            + c["pause_between_unit"],
                         ),
                         product=None,
                         text=lambda c: {
@@ -243,7 +249,9 @@ class CalendarContextBuilder:
                     ContentSpec(
                         start=lambda c: min(
                             7,
-                            c["first_unit_end"] - c["week_start"] + c["pause_duration"],
+                            c["first_unit_end"]
+                            - c["week_start"]
+                            + c["pause_between_unit"],
                         ),
                         end=7,
                         product=None,
@@ -258,7 +266,7 @@ class CalendarContextBuilder:
             ),
             Rule(
                 name="product_restart_this_week",
-                condition=lambda c: c["quantity"] > 1
+                condition=lambda c: c["first_unit_start"] > 1
                 and c["second_unit_start"] >= c["week_start"]
                 and c["second_unit_start"] < c["week_end"],
                 contents=[
@@ -267,7 +275,7 @@ class CalendarContextBuilder:
                         end=7,
                         product=None,
                         text=lambda c: {
-                            "value": f"{'Recommencer' if c['pause_duration'] else 'Continuer'} {c['product']['label']}",
+                            "value": f"{'Recommencer' if c['pause_between_unit'] else 'Continuer'} {c['product']['label']}",
                             "type": TextType.RESTART_PRODUCT,
                             "enabled": True,
                         },
@@ -278,14 +286,14 @@ class CalendarContextBuilder:
             Rule(
                 name="product_continues_through_week",
                 condition=lambda c: c["posology_end"] > c["week_end"]
-                and c["delay"] < c["week_start"],
+                and c["first_unit_start"] < c["week_start"],
                 contents=[
                     ContentSpec(
                         start=0,
                         end=7,
                         product=None,
                         text=lambda c: {
-                            "value": c["product"]["label"],
+                            "value": product["label"],
                             "type": TextType.PRODUCT_LABEL,
                             "enabled": True,
                         }
@@ -309,7 +317,7 @@ class CalendarContextBuilder:
                         end=lambda c: 7 - (c["week_end"] - c["posology_end"]),
                         product=None,
                         text=lambda c: {
-                            "value": f"Arrêter {c['product']['label']}",
+                            "value": f"Arrêter {product['label']}",
                             "type": TextType.STOP_PRODUCT,
                             "enabled": True,
                         },
@@ -328,7 +336,7 @@ class CalendarContextBuilder:
             # ),
             Rule(
                 name="product_not_started",
-                condition=lambda c: c["delay"] >= c["week_end"],
+                condition=lambda c: c["first_unit_start"] >= c["week_end"],
                 contents=[],  # Empty content array
             ),
             Rule(
@@ -342,7 +350,7 @@ class CalendarContextBuilder:
         if week_index == 4:
             pass
 
-        day_time = product["posology_scheme"].day_time
+        day_time = ctx["posology"].day_time
         # Execute first matching rule
         for rule in rules:
             if rule.condition(ctx):
@@ -413,11 +421,11 @@ class CalendarContextBuilder:
                     "icon": p["intake"].unit_icon,
                     "label": p["intake"].unit_label,
                 }
-                for i, p in enumerate(self.calculator.products)
+                for i, p in enumerate(self.products)
                 if not any(
                     p["intake"].unit_icon == prev["intake"].unit_icon
                     and p["intake"].unit_label == prev["intake"].unit_label
-                    for prev in self.calculator.products[:i]
+                    for prev in self.products[:i]
                 )
             ],
             "time": [
@@ -429,10 +437,10 @@ class CalendarContextBuilder:
                     "label": p["intake"].time_of_day_label,
                     "bg_color": p["intake"].time_of_day_color,
                 }
-                for i, p in enumerate(self.calculator.products)
+                for i, p in enumerate(self.products)
                 if not any(
                     p["intake"].time_of_day == prev["intake"].time_of_day
-                    for prev in self.calculator.products[:i]
+                    for prev in self.products[:i]
                 )
             ],
         }

@@ -80,6 +80,7 @@ DELAY_RULES = {
     },
 }
 
+MAX_STARTING_DAYS = 29
 # MULTIPLE_PRODUCT_UNIT_RULES = {
 #     "exceptions": [
 #         13,
