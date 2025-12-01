@@ -1,0 +1,24 @@
+{% load static %}
+<div class="legend__container">
+    <div class="legend__container-title">{{ text.legend.title }}</div>
+    <div class="legend__time-container">
+        {% for v in legend.time %}
+            <div class="legend__time-container--child"
+                 style="background-color: {{ v.bg_color }}">
+                <img class="{{ v.icon.class }}" src="{% static v.icon.src %}">
+                <div class="legend__icon-title">{{ v.label }}</div>
+            </div>
+            {% if not forloop.last %}<div class="legend__line--grey"></div>{% endif %}
+        {% endfor %}
+    </div>
+    <div class="legend__unit-container">
+        <div class="legend__title">{{ text.legend.unit_title }}</div>
+        {% for v in legend.unit %}
+            <div class="legend__icon-container">
+                <img class="legend__icon-svg" src="{% static v.icon %}">
+                <div class="legend__icon-title">{{ v.label }}</div>
+            </div>
+            {% if not forloop.last %}<div class="legend__line--grey"></div>{% endif %}
+        {% endfor %}
+    </div>
+</div>
