@@ -414,6 +414,7 @@ class CalendarContextBuilder:
                 or p["second_unit"]
                 and p["second_unit_start"] >= MAX_STARTING_DAYS - 1
             ],
+            "enabled": self.cart_url,
         }
 
     def _build_legend(self) -> dict:

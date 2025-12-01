@@ -94,7 +94,9 @@
                 </div>
                 <div class="document__right-section">
                     {% include "templates_app/cure_calendar/legend.html" %}
-                    {% include "templates_app/cure_calendar/phase_2_section.html" %}
+                    {% if phase_2.enabled %}
+                        {% include "templates_app/cure_calendar/phase_2_section.html" %}
+                    {% endif %}
                 </div>
             </div>
         </div>

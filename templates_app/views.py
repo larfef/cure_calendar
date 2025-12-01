@@ -48,7 +48,10 @@ def generate_cart_url(products: NormalizedProduct, second_phase: bool) -> str:
 
     raw = b"".join(id.to_bytes(8, "big") for id in ids)
     decoded = base64.urlsafe_b64encode(raw).decode("utf-8")
-    return f"https://symp.co/cure_cart?content={decoded}&client=4666"
+    if len(decoded):
+        return f"https://symp.co/cure_cart?content={decoded}&client=4666"
+    else:
+        return None
 
 
 def calendar(request):
