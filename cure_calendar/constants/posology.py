@@ -81,3 +81,11 @@ DELAY_RULES = {
 }
 
 MAX_STARTING_DAYS = 29
+
+# In cure_calendar/constants/posology.py
+
+DAYS_PER_MONTH = 28
+"""Standard month duration in days (4 weeks)"""
+
+MONTH_BOUNDARY_ADJUSTMENT_WINDOW = 8
+"""Days after month boundary where we round back to previous month end"""

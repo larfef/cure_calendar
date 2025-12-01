@@ -1,7 +1,9 @@
 from typing import List
 from cure_calendar.constants.posology import (
+    DAYS_PER_MONTH,
     DELAY_RULES,
     MAX_STARTING_DAYS,
+    MONTH_BOUNDARY_ADJUSTMENT_WINDOW,
     MULTIPLE_PRODUCT_UNIT_RULES,
 )
 from cure_calendar.models.product import Product
@@ -120,15 +122,30 @@ def adapter_products_data_normalized(
         )
 
         first_unit_end = computed_delay + total_daily_intakes_per_unit
-        if first_unit_end in range(29, 36):
+        if first_unit_end in range(29, 36) and not second_unit:
             first_unit_end = 28
 
         second_unit_start = (
             computed_delay + pause_between_unit + total_daily_intakes_per_unit
         )
 
-        if second_unit_start in range(29, 36):
+        if 29 <= second_unit_start < 37:
             second_unit_start = 29
+
+        posology_end = (
+            total_daily_intakes_per_unit * (second_unit + 1)
+            + computed_delay
+            + pause_between_unit
+        )
+
+        # Adjustement to gain space on A4 by stopping product at the end
+        # of current month, so we avoid one extra line on following month
+        for month_number in range(1, 3):  # months 1 and 2
+            month_start = (DAYS_PER_MONTH + 1) * month_number  # day 29, 58, etc.
+            month_end = month_start + MONTH_BOUNDARY_ADJUSTMENT_WINDOW
+
+            if month_start <= posology_end < month_end:
+                posology_end = DAYS_PER_MONTH * month_number
 
         normalized.append(
             {
@@ -145,13 +162,9 @@ def adapter_products_data_normalized(
                 "first_unit_start": computed_delay,
                 "first_unit_end": first_unit_end,
                 "second_unit": second_unit,
-                "second_unit_start": computed_delay
-                + pause_between_unit
-                + total_daily_intakes_per_unit,
+                "second_unit_start": second_unit_start,
                 "pause_between_unit": pause_between_unit,
-                "posology_end": total_daily_intakes_per_unit * (second_unit + 1)
-                + computed_delay
-                + pause_between_unit,
+                "posology_end": posology_end,
             }
         )
 

@@ -53,13 +53,13 @@ def calendar(request):
                 products_data = load_products_from_yaml("products_snapshot.yaml")
             else:
                 # sample = random.randint(1, 6)
-                sample = 10
+                sample = 7
                 sample_dict = dict(random.sample(list(MOCK_PRODUCTS.items()), sample))
 
                 products_data: ProductsData = {
                     "products": {},
                     "delays": {},
-                    "cortisol_phase": False,
+                    "cortisol_phase": True,
                 }
 
                 for k, v in sample_dict.items():
