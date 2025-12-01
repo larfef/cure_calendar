@@ -1,6 +1,6 @@
-from templates_app.services.rules.base import Rule
-from templates_app.services.rules.specs import ContentSpec
-from templates_app.types import ContentType, NormalizedProduct, TextType
+from cure_calendar.services.rules.base import Rule
+from cure_calendar.services.rules.specs import ContentSpec
+from cure_calendar.types import ContentType, NormalizedProduct, TextType
 
 
 def get_rules(product: NormalizedProduct) -> list[Rule]:

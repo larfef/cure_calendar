@@ -1,5 +1,5 @@
-from typing import TypedDict, Literal
-from templates_app.types.aliases import TimeSlot
+from typing import TypedDict
+from cure_calendar.types.aliases import TimeSlot
 
 
 class WeekDisplayOptions(TypedDict):

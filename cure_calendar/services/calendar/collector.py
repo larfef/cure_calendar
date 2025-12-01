@@ -1,9 +1,9 @@
 import math
 from dataclasses import dataclass, field
 
-from templates_app.services.rules.product_rules import get_rules
-from templates_app.types import SegmentContent
-from templates_app.types import (
+from cure_calendar.services.rules.product_rules import get_rules
+from cure_calendar.types import SegmentContent
+from cure_calendar.types import (
     ContentMap,
     MonthIndex,
     WeekIndex,
@@ -11,7 +11,7 @@ from templates_app.types import (
     ProductId,
     TimeSlot,
 )
-from templates_app.services.posology.calculator import PosologyCalculator
+from cure_calendar.services.posology.calculator import PosologyCalculator
 
 
 N_DAYS_WEEK = 7

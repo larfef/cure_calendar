@@ -1,8 +1,8 @@
 from typing import Dict, List, Union, TypedDict
 from django.db.models.query import QuerySet
-from templates_app.models.posology_scheme import PosologyScheme
-from templates_app.models.posology_intake import PosologyIntake
-from templates_app.models.product import Product
+from cure_calendar.models.posology_scheme import PosologyScheme
+from cure_calendar.models.posology_intake import PosologyIntake
+from cure_calendar.models.product import Product
 
 
 class NutrientDict(TypedDict):

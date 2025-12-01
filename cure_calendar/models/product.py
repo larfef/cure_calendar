@@ -1,7 +1,7 @@
 from typing import Callable
 from django.db import models
 from tinymce.models import HTMLField
-from templates_app.models.posology_choices import IntakeUnit
+from cure_calendar.models.posology_choices import IntakeUnit
 
 
 class Product(models.Model):

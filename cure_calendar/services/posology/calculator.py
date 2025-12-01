@@ -1,11 +1,11 @@
 from typing import List
-from templates_app.constants.posology_constants import (
+from cure_calendar.constants.posology import (
     DELAY_RULES,
     MAX_STARTING_DAYS,
     MULTIPLE_PRODUCT_UNIT_RULES,
 )
-from templates_app.models.product import Product
-from templates_app.types import (
+from cure_calendar.models.product import Product
+from cure_calendar.types import (
     NormalizedProduct,
     ProductsData,
 )

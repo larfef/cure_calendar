@@ -1,7 +1,8 @@
 from django.db import models
-from templates_app.models.product import Product
+from cure_calendar.models.product import Product
 from django.core.validators import MinValueValidator
-from templates_app.models.posology_choices import DurationUnit
+from cure_calendar.models.posology_choices import DurationUnit
+from cure_calendar.models.posology_choices import TimeOfDay
 
 
 class PosologyScheme(models.Model):
@@ -90,7 +91,6 @@ class PosologyScheme(models.Model):
         unique_times = set(times)
         if len(unique_times) == 1:
             t = unique_times.pop()
-            from templates_app.models.posology_choices import TimeOfDay
 
             if t == TimeOfDay.MORNING or t == TimeOfDay.ANYTIME:
                 return "morning"

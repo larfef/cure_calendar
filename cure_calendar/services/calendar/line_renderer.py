@@ -1,6 +1,6 @@
 import copy
 
-from templates_app.types import SegmentContent, ContentType, TextType
+from cure_calendar.types import SegmentContent, ContentType, TextType
 
 
 class LineRenderer:

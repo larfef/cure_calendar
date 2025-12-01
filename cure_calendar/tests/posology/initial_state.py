@@ -1,11 +1,9 @@
-import random
-from templates_app.models.product import Product
-from templates_app.models.posology_scheme import PosologyScheme
-from templates_app.models.posology_intake import PosologyIntake
+from cure_calendar.models.product import Product
+from cure_calendar.models.posology_scheme import PosologyScheme
+from cure_calendar.models.posology_intake import PosologyIntake
 from pathlib import Path
 import yaml
-
-from templates_app.types import ProductsData
+from cure_calendar.types import ProductsData
 
 # Label, Id, Servings, Duration Value, Quantity, Frequency
 
@@ -261,7 +259,6 @@ def load_products_from_yaml(yaml_path: str = "products_snapshot.yaml") -> Produc
         - delays: Dict[int, int] - Delay for each product
         - cortisol_phase: bool - Whether cortisol phase is active
     """
-    from templates_app.models.product import Product
 
     yaml_file = Path(yaml_path)
 

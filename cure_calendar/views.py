@@ -3,21 +3,21 @@ import random
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
-from templates_app.services import CalendarContextBuilder
-from templates_app.constants.posology_constants import MAX_STARTING_DAYS
-from templates_app.data_export.yaml import write_products_to_yaml
-from templates_app.models.product import Product
-from templates_app.services.posology.calculator import (
+from cure_calendar.services import CalendarContextBuilder
+from cure_calendar.constants.posology import MAX_STARTING_DAYS
+from cure_calendar.exporters.yaml import write_products_to_yaml
+from cure_calendar.models.product import Product
+from cure_calendar.services.posology.calculator import (
     PosologyCalculator,
     adapter_products_data_normalized,
 )
-from templates_app.tests.posology.initial_state import (
+from cure_calendar.tests.posology.initial_state import (
     load_products_from_yaml,
     populate_database,
     MOCK_PRODUCTS,
 )
-from templates_app.types import NormalizedProduct, ProductsData
-from templates_app.utils.pdf_generator import generate_pdf_from_url
+from cure_calendar.types import NormalizedProduct, ProductsData
+from cure_calendar.utils.pdf_generator import generate_pdf_from_url
 
 
 def generate_cart_url(products: NormalizedProduct, second_phase: bool) -> str:
@@ -52,8 +52,8 @@ def calendar(request):
             if load_from_yaml:
                 products_data = load_products_from_yaml("products_snapshot.yaml")
             else:
-                sample = random.randint(1, 6)
-                sample = 5
+                # sample = random.randint(1, 6)
+                sample = 10
                 sample_dict = dict(random.sample(list(MOCK_PRODUCTS.items()), sample))
 
                 products_data: ProductsData = {

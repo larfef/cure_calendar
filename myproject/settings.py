@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "nested_admin",
-    "templates_app",
+    "cure_calendar",
 ]
 
 MIDDLEWARE = [

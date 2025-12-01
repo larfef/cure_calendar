@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Callable
-from templates_app.services.rules.specs import ContentSpec
+from cure_calendar.services.rules.specs import ContentSpec
 
 
 @dataclass

@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
-from templates_app.models.posology_scheme import PosologyScheme
-from templates_app.models.posology_choices import IntakeCondition, IntakeUnit, TimeOfDay
+from cure_calendar.models.posology_scheme import PosologyScheme
+from cure_calendar.models.posology_choices import IntakeCondition, IntakeUnit, TimeOfDay
 
 
 class PosologyIntake(models.Model):

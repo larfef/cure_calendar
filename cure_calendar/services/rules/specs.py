@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from templates_app.types import SegmentContent, ContentType
+from cure_calendar.types import SegmentContent, ContentType
 
 
 @dataclass

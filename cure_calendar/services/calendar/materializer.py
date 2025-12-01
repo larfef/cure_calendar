@@ -1,15 +1,15 @@
 from dataclasses import dataclass, field
 
-from templates_app.services.calendar.line_renderer import LineRenderer
-from templates_app.constants.calendar import TIME_SLOTS
-from templates_app.services.calendar.collector import ContentCollector
-from templates_app.types import (
+from cure_calendar.services.calendar.line_renderer import LineRenderer
+from cure_calendar.constants.calendar import TIME_SLOTS
+from cure_calendar.services.calendar.collector import ContentCollector
+from cure_calendar.types import (
     MonthSummary,
     WeekSchedule,
     TimeSlotContent,
     NumLine,
 )
-from templates_app.types import (
+from cure_calendar.types import (
     ContentMap,
     MonthIndex,
     WeekIndex,

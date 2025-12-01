@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-from templates_app.constants.posology import MAX_STARTING_DAYS
-from templates_app.types import MonthSummary, NormalizedProduct
-from templates_app.services.posology.calculator import PosologyCalculator
-from templates_app.constants.calendar import CALENDAR_TEXT
-from templates_app.services.calendar.collector import ContentCollector
-from templates_app.services.calendar.materializer import RowMaterializer
-from templates_app.utils.qrcode import qr_from_url
+from cure_calendar.constants.posology import MAX_STARTING_DAYS
+from cure_calendar.types import MonthSummary, NormalizedProduct
+from cure_calendar.services.posology.calculator import PosologyCalculator
+from cure_calendar.constants.calendar import CALENDAR_TEXT
+from cure_calendar.services.calendar.collector import ContentCollector
+from cure_calendar.services.calendar.materializer import RowMaterializer
+from cure_calendar.utils.qrcode import qr_from_url
 
 
 @dataclass
