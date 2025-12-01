@@ -1,12 +1,15 @@
 import math
 from dataclasses import dataclass
 from typing import Callable, Any
+
+import qrcode
 from templates_app.classes.line_content import (
     ContentDict,
     ContentType,
     LineContent,
     TextType,
 )
+from templates_app.constants.posology_constants import MAX_STARTING_DAYS
 from templates_app.types.calendar import (
     WeekSchedule,
     MonthSummary,
@@ -79,6 +82,20 @@ class Rule:
     contents: list[ContentSpec]  # Returns list[ContentDict]
 
 
+def qr_from_url(url, box_size=5):
+    qr = qrcode.QRCode(
+        image_factory=qrcode.image.svg.SvgPathImage,
+        box_size=box_size,
+        border=0,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    qr_img = qr.make_image()
+    qr_img = qr_img.to_string(encoding="unicode")
+
+    return qr_img
+
+
 @dataclass
 class CalendarContextBuilder:
     """Builds calendar context for template rendering"""
@@ -88,14 +105,7 @@ class CalendarContextBuilder:
 
     calculator: PosologyCalculationModel
     products: NormalizedProduct
-    # months: list[MonthSummary] = []
-
-    # def __init__(
-    #     self, products: NormalizedProduct, calculator: PosologyCalculationModel
-    # ):
-    #     self.calculator = calculator
-    #     self.products = products
-    #     self.months: list[MonthSummary] = []
+    cart_url: str
 
     def build(self) -> dict:
         """Main entry point - builds complete calendar context"""
@@ -121,7 +131,9 @@ class CalendarContextBuilder:
 
         # Create and populate week
         week = self._create_empty_week(
-            time_column=current_week == 0, table_header=current_month == 0
+            week_index=week_index,
+            time_column=current_week == 0,
+            table_header=current_month == 0,
         )
 
         # Add content for each product
@@ -135,8 +147,10 @@ class CalendarContextBuilder:
         self._update_month_line_counts(current_month)
         self._update_week_enabled_slots(week, current_month)
 
+        pass
+
     def _create_empty_week(
-        self, time_column: bool = False, table_header: bool = False
+        self, week_index: int, time_column: bool = False, table_header: bool = False
     ) -> WeekSchedule:
         """Factory for creating properly typed empty week"""
         return {
@@ -147,6 +161,7 @@ class CalendarContextBuilder:
                 "time_column": time_column,
                 "table_header": table_header,
             },
+            "number": week_index + 1,
         }
 
     def _add_product_to_week(
@@ -155,24 +170,6 @@ class CalendarContextBuilder:
         """Add product schedule to appropriate time slot in week"""
         week_start = week_index * self.NB_DAY
         week_end = (week_index + 1) * self.NB_DAY
-
-        # Context with all computed values
-        # ctx = {
-        #     "product": product,
-        #     "week_index": week_index,
-        #     "week_start": week_start,
-        #     "week_end": week_end,
-        #     "posology_end": posology_end,
-        #     "is_first_week": week_index % 4 == 0,
-        #     "is_last_week": week_index % 4 == 3,
-        #     "delay": product["delay"],
-        #     "quantity": product["quantity"],
-        #     "first_unit_end": first_unit_end,
-        #     "second_unit_start": product["delay"]
-        #     + product["total_daily_intakes_per_unit"]
-        #     + product["pause_duration"],
-        #     "pause_duration": product["pause_duration"],
-        # }
 
         ctx = {
             **product,
@@ -382,15 +379,6 @@ class CalendarContextBuilder:
             )
         pass
 
-    # def _update_month_line_counts(self, month_index: int) -> None:
-    # """Update maximum line counts for each time slot in month"""
-    # month = self.months[month_index]
-    # for time_slot in DAY_TIME_SLOTS:
-    #     month["num_lines"][time_slot] = max(
-    #         sum(1 for item in week[time_slot]["rows"] if item != "")
-    #         for week in month["weeks"]
-    #     )
-
     def _update_week_enabled_slots(self, week: WeekSchedule, month_index: int) -> None:
         """Enable/disable time slots based on content"""
         month = self.months[month_index]
@@ -411,6 +399,21 @@ class CalendarContextBuilder:
             "text": CALENDAR_TEXT,
             "months": self.months,
             "legend": self._build_legend(),
+            "phase_2": self._build_phase_2_section(),
+        }
+
+    def _build_phase_2_section(self) -> dict:
+        if not self.cart_url:
+            return None
+        return {
+            "qr_code": qr_from_url(self.cart_url),
+            "products": [
+                p["label"]
+                for p in self.products
+                if p["first_unit_start"] >= MAX_STARTING_DAYS - 1
+                or p["second_unit"]
+                and p["second_unit_start"] >= MAX_STARTING_DAYS - 1
+            ],
         }
 
     def _build_legend(self) -> dict:

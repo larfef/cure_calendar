@@ -135,6 +135,7 @@ def adapter_products_data_normalized(
         normalized.append(
             {
                 "id": product.id,
+                "shopify_id": product.shopify_id,
                 "label": strip_tags(product.label),
                 "phase": product.phase,
                 "posology": posology_scheme,
@@ -234,44 +235,3 @@ class PosologyCalculationModel:
     #         return 0
 
     #     return int(MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes)
-
-    def to_dict(self):
-        """Return a serializable dictionary representation of products."""
-        serializable_products = []
-
-        for product in self.products:
-            serializable_product = {
-                "id": product["id"],
-                "label": product["label"],
-                "delay": product["delay"],
-                "base_delay": product["base_delay"],
-                "phase": product["phase"],
-                "quantity": product["quantity"],
-                "servings": product["servings"],
-                "total_daily_quantity": product["total_daily_quantity"],
-                "total_daily_intakes_per_unit": product["total_daily_intakes_per_unit"],
-                "pause_duration": product["pause_duration"],
-            }
-
-            if product.get("nutrients"):
-                serializable_product["nutrients"] = product["nutrients"]
-
-            if product.get("posology_scheme"):
-                ps = product["posology_scheme"]
-                serializable_product["posology_scheme"] = {
-                    "duration_value": ps.duration_value,
-                    "day_time": ps.day_time,
-                }
-
-            if product.get("intake"):
-                intake = product["intake"]
-                serializable_product["intake"] = {
-                    "time_of_day": intake.time_of_day,
-                    "time_of_day_label": intake.time_of_day_label,
-                    "unit_icon": intake.unit_icon,
-                    "unit_label": intake.unit_label,
-                }
-
-            serializable_products.append(serializable_product)
-
-        return serializable_products

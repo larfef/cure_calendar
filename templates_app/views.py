@@ -1,3 +1,6 @@
+import qrcode
+import qrcode.image.svg
+import base64
 from calendar import HTMLCalendar
 from http.client import HTTPResponse
 import random
@@ -11,6 +14,7 @@ from templates_app.classes.posology_calculation_model import (
     adapter_products_data_normalized,
 )
 from templates_app.constants.calendar_constants import CALENDAR_TEXT
+from templates_app.constants.posology_constants import MAX_STARTING_DAYS
 from templates_app.logging.yaml_writer import write_products_to_yaml
 from templates_app.classes.line_content import (
     ContentDict,
@@ -24,8 +28,27 @@ from templates_app.tests.posology.initial_state import (
     populate_database,
     MOCK_PRODUCTS,
 )
-from templates_app.types.product import ProductsData
+from templates_app.types.product import NormalizedProduct, ProductsData
 from templates_app.utils.pdf_generator import generate_pdf_from_url
+
+from enum import Enum
+
+
+def generate_cart_url(products: NormalizedProduct, second_phase: bool) -> str:
+    if second_phase:
+        ids = [
+            p["shopify_id"]
+            for p in products
+            if p["first_unit_start"] >= MAX_STARTING_DAYS - 1
+            or p["second_unit"]
+            and p["second_unit_start"] >= MAX_STARTING_DAYS - 1
+        ]
+    else:
+        ids = [p["shopify_id"] for p in products]
+
+    raw = b"".join(id.to_bytes(8, "big") for id in ids)
+    decoded = base64.urlsafe_b64encode(raw).decode("utf-8")
+    return f"https://symp.co/cure_cart?content={decoded}&client=4666"
 
 
 def calendar(request):
@@ -40,14 +63,14 @@ def calendar(request):
             if load_from_yaml:
                 products_data = load_products_from_yaml("products_snapshot.yaml")
             else:
-                # sample = random.randint(1, 6)
-                sample = 2
+                sample = random.randint(1, 6)
+                sample = 5
                 sample_dict = dict(random.sample(list(MOCK_PRODUCTS.items()), sample))
 
                 products_data: ProductsData = {
                     "products": {},
                     "delays": {},
-                    "cortisol_phase": True,
+                    "cortisol_phase": False,
                 }
 
                 for k, v in sample_dict.items():
@@ -63,6 +86,9 @@ def calendar(request):
                 products_data,
             )
 
+            url = generate_cart_url(normalized_products, second_phase=True)
+            pass
+
             # # Compute states common to products
             calculator = PosologyCalculationModel(
                 normalized_products,
@@ -76,15 +102,13 @@ def calendar(request):
 
             # Initialize builder
             builder = CalendarContextBuilder(
-                calculator=calculator, products=normalized_products
+                calculator=calculator, products=normalized_products, cart_url=url
             )
 
             context = builder.build()
             pass
 
-            response = render(
-                request, "templates_app/cure_calendar/calendar.html", context
-            )
+            response = render(request, "templates_app/cure_calendar/base.html", context)
             transaction.set_rollback(True)
             return response
             # return HttpResponse(status=200)

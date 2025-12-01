@@ -1,5 +1,4 @@
-from asyncio import proactor_events
-from typing import Callable, Dict
+from typing import Callable
 from django.db import models
 from tinymce.models import HTMLField
 from templates_app.models.posology_choices import IntakeUnit
@@ -11,6 +10,9 @@ class Product(models.Model):
     # === Existing fields ===
     label = HTMLField(default=None, blank=True, null=True, verbose_name="Label")
     phase = models.PositiveIntegerField(default=1, null=True, blank=True)
+    shopify_id = models.BigIntegerField(
+        default=None, blank=True, null=True, verbose_name="Shopify Product ID"
+    )
     # === New fields ===
     servings = models.PositiveIntegerField(
         default=50, verbose_name="Nombre total de dose par produit"

@@ -27,6 +27,7 @@ class NormalizedProduct(TypedDict):
     """Product with computed values ready for calendar rendering"""
 
     id: int
+    shopify_id: int
     label: str
     phase: int
     posology: PosologyScheme

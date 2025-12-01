@@ -42,7 +42,7 @@ class LineContent:
         )
 
         self.text_type_to_css_style: dict = {
-            TextType.PRODUCT_LABEL: "product-label__intake product-label",
+            TextType.PRODUCT_LABEL: "product-label--layout product-label",
             TextType.RESTART_PRODUCT: "line-container__restart",
             TextType.STOP_PRODUCT: "line-container__stop",
             TextType.PAUSE: "pause-container__text pause-text",

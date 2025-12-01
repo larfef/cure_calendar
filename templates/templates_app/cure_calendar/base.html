@@ -28,6 +28,9 @@
         <link rel="stylesheet"
               type="text/css"
               href="{% static 'templates_app/css/cure_calendar/header.css' %}">
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'templates_app/css/cure_calendar/phase_2_section.css' %}">
         <style>
             @page {
                 size: A4 landscape;
@@ -73,8 +76,8 @@
     <body>
         <div>
             {% include "templates_app/cure_calendar/header.html" %}
-            <div style="padding-top: 16px; display: flex; gap: 4pt">
-                <div style="display: flex; flex-direction: column; gap: 16px">
+            <div style="padding-top: 12pt; display: flex; gap: 4pt">
+                <div style="display: flex; flex-direction: column; gap: 12pt">
                     {% for month in months %}
                         <div style="display: flex;">
                             {% for week in month.weeks %}
@@ -82,13 +85,17 @@
                                      style="margin-right: {% if forloop.counter == 1 or forloop.counter == 3 %}7px{% elif forloop.counter == 2 %}31px{% endif %};
                                             position: relative;
                                             z-index: {{ forloop.revcounter }}">
+                                    <span class="week-number__text">sem.{{ week.number }}</span>
                                     {% include "templates_app/cure_calendar/week.html" with month=month %}
                                 </div>
                             {% endfor %}
                         </div>
                     {% endfor %}
                 </div>
-                <div class="document__right-section">{% include "templates_app/cure_calendar/legend.html" %}</div>
+                <div class="document__right-section">
+                    {% include "templates_app/cure_calendar/legend.html" %}
+                    {% include "templates_app/cure_calendar/phase_2_section.html" %}
+                </div>
             </div>
         </div>
         <script src="{% static 'templates_app/js/cure_calendar/prevent_text_overflow.js' %}"></script>
