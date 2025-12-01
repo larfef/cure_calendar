@@ -80,16 +80,16 @@ class PosologyIntake(models.Model):
     def unit_icon(self):
         """Return SVG path for the intake unit"""
         UNIT_ICON = {
-            IntakeUnit.CAPSULE: "templates_app/images/capsules.svg",
-            IntakeUnit.DROP: "templates_app/images/drop.svg",
-            IntakeUnit.ML: "templates_app/images/drop.svg",
-            IntakeUnit.DOSETTE: "templates_app/images/dosette.svg",
+            IntakeUnit.CAPSULE: "cure_calendar/images/capsules.svg",
+            IntakeUnit.DROP: "cure_calendar/images/drop.svg",
+            IntakeUnit.ML: "cure_calendar/images/drop.svg",
+            IntakeUnit.DOSETTE: "cure_calendar/images/dosette.svg",
         }
 
         # Designer make us crazy
         # Exception when icon depends on unit and quantity
         if self.intake_unit == "CAPSULE" and self.quantity > 1:
-            return "templates_app/images/capsules.svg"
+            return "cure_calendar/images/capsules.svg"
         return UNIT_ICON.get(self.intake_unit)
 
     @property
@@ -105,9 +105,9 @@ class PosologyIntake(models.Model):
     def time_of_day_icon(self):
         """Return SVG path for the intake time of day"""
         TIME_OF_DAY = {
-            TimeOfDay.MORNING: "templates_app/images/morning.svg",
-            TimeOfDay.EVENING: "templates_app/images/evening.svg",
-            TimeOfDay.MIXED: "templates_app/images/morning_evening.svg",
+            TimeOfDay.MORNING: "cure_calendar/images/morning.svg",
+            TimeOfDay.EVENING: "cure_calendar/images/evening.svg",
+            TimeOfDay.MIXED: "cure_calendar/images/morning_evening.svg",
         }
         return TIME_OF_DAY.get(self.time_of_day)
 

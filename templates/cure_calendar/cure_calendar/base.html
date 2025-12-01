@@ -9,28 +9,28 @@
               rel="stylesheet">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'templates_app/css/cure_calendar/common.css' %}">
+              href="{% static 'cure_calendar/css/cure_calendar/common.css' %}">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'templates_app/css/cure_calendar/table.css' %}">
+              href="{% static 'cure_calendar/css/cure_calendar/table.css' %}">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'templates_app/css/cure_calendar/week.css' %}">
+              href="{% static 'cure_calendar/css/cure_calendar/week.css' %}">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'templates_app/css/cure_calendar/line.css' %}">
+              href="{% static 'cure_calendar/css/cure_calendar/line.css' %}">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'templates_app/css/cure_calendar/intake.css' %}">
+              href="{% static 'cure_calendar/css/cure_calendar/intake.css' %}">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'templates_app/css/cure_calendar/legend.css' %}">
+              href="{% static 'cure_calendar/css/cure_calendar/legend.css' %}">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'templates_app/css/cure_calendar/header.css' %}">
+              href="{% static 'cure_calendar/css/cure_calendar/header.css' %}">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'templates_app/css/cure_calendar/phase_2_section.css' %}">
+              href="{% static 'cure_calendar/css/cure_calendar/phase_2_section.css' %}">
         <style>
             @page {
                 size: A4 landscape;
@@ -75,7 +75,7 @@
     </head>
     <body>
         <div>
-            {% include "templates_app/cure_calendar/header.html" %}
+            {% include "cure_calendar/cure_calendar/header.html" %}
             <div style="padding-top: 12pt; display: flex; gap: 4pt">
                 <div style="display: flex; flex-direction: column; gap: 12pt">
                     {% for month in months %}
@@ -86,20 +86,20 @@
                                             position: relative;
                                             z-index: {{ forloop.revcounter }}">
                                     <span class="week-number__text">sem.{{ week.number }}</span>
-                                    {% include "templates_app/cure_calendar/week.html" with month=month %}
+                                    {% include "cure_calendar/cure_calendar/week.html" with month=month %}
                                 </div>
                             {% endfor %}
                         </div>
                     {% endfor %}
                 </div>
                 <div class="document__right-section">
-                    {% include "templates_app/cure_calendar/legend.html" %}
+                    {% include "cure_calendar/cure_calendar/legend.html" %}
                     {% if phase_2.enabled %}
-                        {% include "templates_app/cure_calendar/phase_2_section.html" %}
+                        {% include "cure_calendar/cure_calendar/phase_2_section.html" %}
                     {% endif %}
                 </div>
             </div>
         </div>
-        <script src="{% static 'templates_app/js/cure_calendar/prevent_text_overflow.js' %}"></script>
+        <script src="{% static 'cure_calendar/js/cure_calendar/prevent_text_overflow.js' %}"></script>
     </body>
 </html>

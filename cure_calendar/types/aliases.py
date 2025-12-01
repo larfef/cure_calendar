@@ -1,5 +1,5 @@
 """
-Centralized type aliases for the templates_app.
+Centralized type aliases for the cure_calendar app.
 
 Simple type aliases (ints, Literals) live here.
 Complex TypedDicts remain in their domain-specific files.

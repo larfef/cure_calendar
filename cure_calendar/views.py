@@ -96,7 +96,7 @@ def calendar(request):
             context = builder.build()
             pass
 
-            response = render(request, "templates_app/cure_calendar/base.html", context)
+            response = render(request, "cure_calendar/cure_calendar/base.html", context)
             transaction.set_rollback(True)
             return response
             # return HttpResponse(status=200)
@@ -240,4 +240,4 @@ def cure(request):
         "cure_template": cure,
     }
 
-    return render(request, "templates_app/cure.html", context)
+    return render(request, "cure_calendar/cure.html", context)

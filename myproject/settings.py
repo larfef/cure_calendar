@@ -119,7 +119,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "templates_app" / "static",
+    BASE_DIR / "cure_calendar" / "static",
 ]
 
 # Default primary key field type

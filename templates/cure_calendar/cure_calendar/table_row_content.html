@@ -5,7 +5,7 @@
             {{ current.container.padding_left }}">
     {% for content in current.contents %}
         {% if content.product %}
-            {% include "templates_app/cure_calendar/intake.html" with product=content.product %}
+            {% include "cure_calendar/cure_calendar/intake.html" with product=content.product %}
         {% endif %}
         {% if content.text.enabled %}
             <div class="{{ content.text.class }}" style="{{ content.text.style }}">{{ content.text.value }}</div>
