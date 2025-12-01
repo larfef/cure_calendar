@@ -2,12 +2,10 @@ import random
 from templates_app.models.product import Product
 from templates_app.models.posology_scheme import PosologyScheme
 from templates_app.models.posology_intake import PosologyIntake
-from templates_app.models.posology_intake import IntakeUnit, TimeOfDay
 from pathlib import Path
 import yaml
-from typing import List, Dict
 
-from templates_app.types.product import ProductsData
+from templates_app.types import ProductsData
 
 # Label, Id, Servings, Duration Value, Quantity, Frequency
 
@@ -264,7 +262,6 @@ def load_products_from_yaml(yaml_path: str = "products_snapshot.yaml") -> Produc
         - cortisol_phase: bool - Whether cortisol phase is active
     """
     from templates_app.models.product import Product
-    from templates_app.types.product import ProductsData
 
     yaml_file = Path(yaml_path)
 

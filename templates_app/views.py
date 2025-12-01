@@ -1,37 +1,23 @@
-import qrcode
-import qrcode.image.svg
 import base64
-from calendar import HTMLCalendar
-from http.client import HTTPResponse
 import random
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
-from templates_app.classes.calendar_context_builder import CalendarContextBuilder
-from templates_app.classes.posology_calculation_model import (
-    CORTISOL_PHASE_DURATION_DAYS,
-    PosologyCalculationModel,
+from templates_app.services import CalendarContextBuilder
+from templates_app.constants.posology_constants import MAX_STARTING_DAYS
+from templates_app.data_export.yaml import write_products_to_yaml
+from templates_app.models.product import Product
+from templates_app.services.posology.calculator import (
+    PosologyCalculator,
     adapter_products_data_normalized,
 )
-from templates_app.constants.calendar_constants import CALENDAR_TEXT
-from templates_app.constants.posology_constants import MAX_STARTING_DAYS
-from templates_app.logging.yaml_writer import write_products_to_yaml
-from templates_app.classes.line_content import (
-    ContentDict,
-    ContentType,
-    LineContent,
-    TextType,
-)
-from templates_app.models.product import Product
 from templates_app.tests.posology.initial_state import (
     load_products_from_yaml,
     populate_database,
     MOCK_PRODUCTS,
 )
-from templates_app.types.product import NormalizedProduct, ProductsData
+from templates_app.types import NormalizedProduct, ProductsData
 from templates_app.utils.pdf_generator import generate_pdf_from_url
-
-from enum import Enum
 
 
 def generate_cart_url(products: NormalizedProduct, second_phase: bool) -> str:
@@ -90,10 +76,9 @@ def calendar(request):
             )
 
             url = generate_cart_url(normalized_products, second_phase=True)
-            pass
 
             # # Compute states common to products
-            calculator = PosologyCalculationModel(
+            calculator = PosologyCalculator(
                 normalized_products,
                 cortisol_phase=products_data["cortisol_phase"],
                 # cortisol_phase=any(p["phase"] == 1 for p in normalized_products),
@@ -146,54 +131,6 @@ def calendar_pdf(request):
         return response
     except Exception as e:
         return HttpResponse(f"Error generating PDF: {str(e)}", status=500)
-
-
-def assets(request):
-    content: list[ContentDict] = [
-        {
-            "start": 0,
-            "end": 1,
-            "type": {"css": ContentType.GREEN_LINE, "inline": ContentType.CELL},
-        },
-        {
-            "start": 2,
-            "end": 4,
-            "text": {
-                "value": "Arrêter",
-                "type": TextType.STOP_PRODUCT,
-                "enabled": True,
-            },
-            "type": {"css": ContentType.GREEN_LINE, "inline": ContentType.CELL},
-        },
-        {
-            "start": 5,
-            "end": 7,
-            "type": {"css": ContentType.GREEN_LINE, "inline": ContentType.CELL},
-        },
-    ]
-    line_1 = LineContent(content, time_col=True).get_context()
-    context = {
-        "text": CALENDAR_TEXT,
-        "month": {"morning": {"num_line": 2}, "evening": {"num_line": 2}},
-        "weeks": [
-            {
-                "time_col": True,
-                "morning": {"enabled": True, "rows": [line_1]},
-                "evening": {"enabled": True, "rows": []},
-                "mixed": {"enabled": False, "rows": []},
-                "table_header": True,
-            },
-        ],
-        "empty_week": {"enabled": True},
-    }
-
-    try:
-        response = render(
-            request, "templates_app/cure_calendar/assets/base.html", context
-        )
-        return response
-    except Exception as e:
-        return HttpResponse(f"Error rendering template: {e}")
 
 
 def cure(request):

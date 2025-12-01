@@ -16,4 +16,4 @@ CALENDAR_TEXT = {
     },
 }
 
-DAY_TIME_SLOTS = ("morning", "evening", "mixed")
+TIME_SLOTS = ("morning", "evening", "mixed")

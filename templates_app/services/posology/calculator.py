@@ -1,13 +1,11 @@
-from typing import Dict, List, Union
-
+from typing import List
 from templates_app.constants.posology_constants import (
     DELAY_RULES,
     MAX_STARTING_DAYS,
     MULTIPLE_PRODUCT_UNIT_RULES,
 )
 from templates_app.models.product import Product
-from templates_app.types.product import (
-    AdaptedA5Product,
+from templates_app.types import (
     NormalizedProduct,
     ProductsData,
 )
@@ -168,7 +166,7 @@ class ProductValidationError(Exception):
     pass
 
 
-class PosologyCalculationModel:
+class PosologyCalculator:
     def __init__(
         self,
         products: List[NormalizedProduct],
@@ -196,7 +194,7 @@ class PosologyCalculationModel:
                 "first_unit_start"
             ]
 
-    def get_microbiote_phase_end(self):
+    def get_cure_end_day(self):
         max_product = max(
             self.products,
             key=lambda p: p["posology_end"],
@@ -223,15 +221,3 @@ class PosologyCalculationModel:
         # When product id is in always list
         # It means there is always a second product unit
         return id in MULTIPLE_PRODUCT_UNIT_RULES[self.cortisol_phase][phase]["always"]
-
-    # def get_pause_between_product_unit(self, product: AdaptedA5Product):
-    #     # No pause if there is only one product unit
-    #     if not product["has_second_unit"]:
-    #         return 0
-
-    #     total_daily_intakes = self.get_total_daily_intakes_per_product_unit(product)
-
-    #     if total_daily_intakes > MAX_DAYS_BETWEEN_PRODUCT_UNIT:
-    #         return 0
-
-    #     return int(MAX_DAYS_BETWEEN_PRODUCT_UNIT - total_daily_intakes)

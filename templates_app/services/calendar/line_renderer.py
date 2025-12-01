@@ -1,42 +1,12 @@
 import copy
-from typing import TypedDict
-from enum import IntEnum
+
+from templates_app.types import SegmentContent, ContentType, TextType
 
 
-class TextType(IntEnum):
-    DEFAULT = 0
-    PRODUCT_LABEL = 1
-    RESTART_PRODUCT = 2
-    STOP_PRODUCT = 3
-    PAUSE = 4
-
-
-class ContentType(IntEnum):
-    CELL = 0
-    GREEN_LINE = 1
-    RED_LINE = 2
-    ARROW = 3
-    PAUSE = 4
-
-
-class TextDict(TypedDict):
-    value: str
-    type: TextType
-    enabled: bool
-
-
-class ContentDict(TypedDict):
-    end: int
-    product: dict | None
-    start: int
-    text: TextDict | None
-    type: str
-
-
-class LineContent:
+class LineRenderer:
     """Handles line rendering logic for cure calendar"""
 
-    def __init__(self, contents: list[ContentDict], time_col: bool = False):
+    def __init__(self, contents: list[SegmentContent], time_col: bool = False):
         self.base_width = (
             "var(--cell-width)" if not time_col else "calc( 6 * var(--cell-width) / 7)"
         )

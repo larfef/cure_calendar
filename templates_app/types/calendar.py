@@ -1,7 +1,5 @@
 from typing import TypedDict, Literal
-
-# Type alias for clearer intent
-DayTimeSlot = Literal["morning", "evening", "mixed"]
+from templates_app.types.aliases import TimeSlot
 
 
 class WeekDisplayOptions(TypedDict):
@@ -16,7 +14,6 @@ class TimeSlotContent(TypedDict):
 
     enabled: bool  # Whether this time slot has any scheduled items
     rows: list  # List of TableRowContent dicts (medication schedules)
-    # Future: rows: list[TableRowContentDict] when you have that type defined
 
 
 class WeekSchedule(TypedDict):
@@ -47,7 +44,7 @@ class MonthSummary(TypedDict):
 class CalendarWeekRange(TypedDict):
     """Week definition with time range"""
 
-    day_time: DayTimeSlot  # Which time slot this represents
+    day_time: TimeSlot  # Which time slot this represents
     start_day: int  # Starting day index
     end_day: int  # Ending day index
     schedule: WeekSchedule
