@@ -154,7 +154,7 @@ MOCK_PRODUCTS = {
     "Allicine": {
         "id": 18,
         "shopify_id": "9845272969545",
-        "servings": 90,
+        "servings": 60,
         "duration": 60,
         "quantity": 1,
         "frequency": 1,

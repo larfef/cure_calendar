@@ -23,7 +23,7 @@ class IntakeUnit(models.TextChoices):
     CAPSULE = "CAPSULE", "Gélule"
     TABLET = "TABLET", "Comprimé"
     ML = "ML", "ml"
-    DROP = "DROP", "Goutte"
+    DROP = "DROP", "Capuchon"
     DOSE = "DOSE", "Dose"
     DOSETTE = "DOSETTE", "Dosette"
     SACHET = "SACHET", "Sachet"

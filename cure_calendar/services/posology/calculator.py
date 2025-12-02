@@ -140,7 +140,7 @@ def adapter_products_data_normalized(
 
         # Adjustement to gain space on A4 by stopping product at the end
         # of current month, so we avoid one extra line on following month
-        for month_number in range(1, 3):  # months 1 and 2
+        for month_number in range(1, 4):  # months [1, 3]
             month_start = (DAYS_PER_MONTH + 1) * month_number  # day 29, 58, etc.
             month_end = month_start + MONTH_BOUNDARY_ADJUSTMENT_WINDOW
 

@@ -82,7 +82,7 @@ def get_rules(product: NormalizedProduct) -> list[Rule]:
         Rule(
             name="product_restart_this_week",
             condition=lambda c: (
-                c["first_unit_start"] > 1
+                c["second_unit"]
                 and c["second_unit_start"] >= c["week_start"]
                 and c["second_unit_start"] < c["week_end"]
             ),
