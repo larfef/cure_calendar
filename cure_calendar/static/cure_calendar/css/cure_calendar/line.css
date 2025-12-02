@@ -22,10 +22,10 @@
     position: absolute;
     white-space: nowrap;
     color: var(--neutral-gray-700, #3A423A);
-    font-size: 6pt;
+    font-size: var(--font-sm);
     font-style: normal;
     font-weight: 500;
-    line-height: 6pt;
+    line-height: var(--line-height-sm);
     letter-spacing: -0.12pt;
     right: 1px;
     top: 4px;
@@ -36,10 +36,10 @@
     top: 2pt;
     left: 2pt;
     color: var(--neutral-gray-700, #3A423A);
-    font-size: 8pt;
+    font-size: var(--font-sm);
     font-style: normal;
     font-weight: 400;
-    line-height: 8pt;
+    line-height: var(--line-height-sm);
     letter-spacing: -0.12pt;
 }
 
@@ -48,10 +48,10 @@
     position: absolute;
 
     color: var(--neutral-gray-700, #3A423A);
-    font-size: 6pt;
+    font-size: var(--font-sm);
     font-style: normal;
     font-weight: 500;
-    line-height: 6pt;
+    line-height: var(--line-height-sm);
     letter-spacing: -0.12pt;
     margin-top: 4px;
 }
@@ -88,11 +88,11 @@
 .pause-text {
     color: var(--neutral-gray-700, #3A423A);
     text-align: center;
-    font-size: 8px;
+    font-size: var(--font-sm);
     font-style: normal;
     white-space: nowrap;
     font-weight: 400;
-    line-height: 8px;
+    line-height: var(--line-height-sm);
     letter-spacing: -0.16px;
 }
 
@@ -100,10 +100,10 @@
     position: absolute;
 
     color: var(--neutral-gray-700, #3A423A);
-    font-size: 8pt;
+    font-size: var(--font-sm);
     font-style: normal;
     font-weight: 500;
-    line-height: 8pt;
+    line-height: var(--line-height-sm);
     letter-spacing: -0.12pt;
     margin-top: 4px;
     white-space: nowrap;
