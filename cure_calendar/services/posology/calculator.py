@@ -103,7 +103,7 @@ def adapter_products_data_normalized(
                 product.id == 13
                 and not any(other.id == 25 for other in products_list)
                 or not products_data.get("cortisol_phase")
-                and not products_data.get("delays")[product.id]
+                and not products_data.get("delays").get(product.id)
             )
             or product._has_second_unit(
                 rule=lambda p: p
