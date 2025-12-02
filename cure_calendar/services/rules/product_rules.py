@@ -1,3 +1,4 @@
+from cure_calendar.constants.posology import LAST_WEEK_TO_DISPLAY
 from cure_calendar.services.rules.base import Rule
 from cure_calendar.services.rules.specs import ContentSpec
 from cure_calendar.types import ContentType, NormalizedProduct, TextType
@@ -25,6 +26,28 @@ def get_rules(product: NormalizedProduct) -> list[Rule]:
                     type_css=lambda c: ContentType.ARROW
                     if c["is_last_week"]
                     else ContentType.GREEN_LINE,
+                )
+            ],
+        ),
+        Rule(
+            name="product_continues_during_week_12",
+            condition=lambda c, p=product: (
+                c["week_index"] == LAST_WEEK_TO_DISPLAY - 1
+                and p["posology_end"] > c["week_end"]
+            ),
+            contents=[
+                ContentSpec(
+                    start=0,
+                    end=7,
+                    product=None,
+                    text=lambda p=product: (
+                        {
+                            "value": f"{p['label']} Terminer la boite",
+                            "type": TextType.FINISH_PRODUCT,
+                            "enabled": True,
+                        }
+                    ),
+                    type_css=ContentType.GREEN_LINE,
                 )
             ],
         ),
@@ -99,27 +122,6 @@ def get_rules(product: NormalizedProduct) -> list[Rule]:
                         "enabled": True,
                     },
                     type_css=lambda c: ContentType.GREEN_LINE,
-                )
-            ],
-        ),
-        Rule(
-            name="product_continues_during_week_12",
-            condition=lambda c, p=product: (
-                c["week_index"] == 11 and p["posology_end"] > c["week_end"]
-            ),
-            contents=[
-                ContentSpec(
-                    start=0,
-                    end=7,
-                    product=None,
-                    text=lambda p=product: (
-                        {
-                            "value": f"{p['label']} Terminer la boite",
-                            "type": TextType.FINISH_PRODUCT,
-                            "enabled": True,
-                        }
-                    ),
-                    type_css=ContentType.GREEN_LINE,
                 )
             ],
         ),
