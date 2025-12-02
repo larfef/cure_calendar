@@ -24,7 +24,7 @@
     color: var(--neutral-gray-700, #3A423A);
     font-size: var(--font-sm);
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
     line-height: var(--line-height-sm);
     letter-spacing: -0.12pt;
     right: 1px;
@@ -50,7 +50,7 @@
     color: var(--neutral-gray-700, #3A423A);
     font-size: var(--font-sm);
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
     line-height: var(--line-height-sm);
     letter-spacing: -0.12pt;
     margin-top: 4px;
@@ -102,7 +102,7 @@
     color: var(--neutral-gray-700, #3A423A);
     font-size: var(--font-sm);
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
     line-height: var(--line-height-sm);
     letter-spacing: -0.12pt;
     margin-top: 4px;
