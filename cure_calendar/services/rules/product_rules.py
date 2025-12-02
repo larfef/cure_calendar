@@ -65,9 +65,12 @@ def get_rules(product: NormalizedProduct) -> list[Rule]:
                     end=lambda c: c["first_unit_end"] - c["week_start"],
                     product=None,
                     text=lambda c, p=product: {
-                        "value": f"{p['label']} : Terminer boite 1"
-                        if not c["week_index"] % 3
-                        else f" Arrêter {p['label']}",
+                        # "value": f"{p['label']} : Terminer boite 1"
+                        # if not c["week_index"] % 3 and not p["pause_between_unit"]
+                        # else f" Arrêter {p['label']}",
+                        "value": f" Arrêter {p['label']}"
+                        if c["week_index"] % 3 or p["pause_between_unit"]
+                        else f"{p['label']} : Terminer boite 1",
                         "type": TextType.STOP_PRODUCT,
                         "enabled": True,
                     },
