@@ -85,7 +85,7 @@
                                      style="margin-right: {% if forloop.counter == 1 or forloop.counter == 3 %}7px{% elif forloop.counter == 2 %}31px{% endif %};
                                             position: relative;
                                             z-index: {{ forloop.revcounter }}">
-                                    <span class="week-number__text">sem.{{ week.number }}</span>
+                                    <span class="week-number__text">{{ text.week }} {{ week.number }}</span>
                                     {% include "cure_calendar/week.html" with month=month %}
                                 </div>
                             {% endfor %}

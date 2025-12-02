@@ -13,6 +13,7 @@ CALENDAR_TEXT = {
         "2": "phase 2",
         "3": "de votre cure, veuillez scanner le code QR ci-dessus",
     },
+    "week": "Semaine",
 }
 
 TIME_SLOTS = ("morning", "evening", "mixed")
