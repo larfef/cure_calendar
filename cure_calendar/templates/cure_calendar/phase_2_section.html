@@ -6,13 +6,4 @@
         <span class="phase_2_section_paragraph--green">{{ text.phase_2.2 }}</span>
         {{ text.phase_2.3 }}
     </div>
-    <div>
-        <span class="phase_2_section_paragraph phase_2_section_paragraph--grey-800">{{ text.phase_2.4 }}</span>
-        <br>
-        <br>
-        {% for p in phase_2.products %}
-            <span class="phase_2_section_paragraph phase_2_section_paragraph--grey-800"><b>{{ forloop.counter }}. {{ p }}</b></span>
-            <br>
-        {% endfor %}
-    </div>
 </div>

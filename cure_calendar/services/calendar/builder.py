@@ -48,14 +48,6 @@ class CalendarContextBuilder:
         """Build phase 2 section with QR code for reorder"""
         return {
             "qr_code": qr_from_url(self.cart_url),
-            "products": [
-                p["label"]
-                for p in self.products
-                if p["first_unit_start"] >= MAX_STARTING_DAYS - 1
-                or (
-                    p["second_unit"] and p["second_unit_start"] >= MAX_STARTING_DAYS - 1
-                )
-            ],
             "enabled": self.cart_url,
         }
 

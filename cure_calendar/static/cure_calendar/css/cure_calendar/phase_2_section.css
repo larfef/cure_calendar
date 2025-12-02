@@ -39,7 +39,3 @@
 .phase_2_section_paragraph--green {
     color: #20CF86;
 }
-
-.phase_2_section_paragraph--grey-800 {
-    color: var(--Neutral-Gray-800, #2A322A);
-}

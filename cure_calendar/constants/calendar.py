@@ -9,10 +9,9 @@ CALENDAR_TEXT = {
     },
     "legend": {"title": "Légende", "unit_title": "Prise"},
     "phase_2": {
-        "1": "Afin de poursuivre la",
+        "1": "Afin de commencer la",
         "2": "phase 2",
-        "3": "de votre cure, vous aurez besoin des compléments suivants:",
-        "4": "Liste :",
+        "3": "de votre cure, veuillez scanner le code QR ci-dessus",
     },
 }
 
