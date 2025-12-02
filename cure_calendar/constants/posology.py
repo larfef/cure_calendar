@@ -90,5 +90,5 @@ DAYS_PER_MONTH = 28
 MONTH_BOUNDARY_ADJUSTMENT_WINDOW = 8
 """Days after month boundary where we round back to previous month end"""
 
-MAX_WEEKS = 12
-"""Maximum weeks to display in templates"""
+LAST_WEEK_TO_DISPLAY = 12
+"""Last week to display in templates"""

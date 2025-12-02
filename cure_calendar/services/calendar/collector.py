@@ -1,7 +1,7 @@
 import math
 from dataclasses import dataclass, field
 
-from cure_calendar.constants.posology import MAX_WEEKS
+from cure_calendar.constants.posology import LAST_WEEK_TO_DISPLAY
 from cure_calendar.services.rules.base import Rule
 from cure_calendar.services.rules.product_rules import get_rules
 from cure_calendar.types import SegmentContent
@@ -36,8 +36,8 @@ class ContentCollector:
         """Main entry point - collects all content and returns the map"""
         total_weeks = math.ceil(self.calculator.get_cure_end_day() / N_DAYS_WEEK)
 
-        if total_weeks > 12:
-            total_weeks = MAX_WEEKS
+        if total_weeks > LAST_WEEK_TO_DISPLAY:
+            total_weeks = LAST_WEEK_TO_DISPLAY
 
         for week_index in range(total_weeks):
             self._process_week(week_index)
