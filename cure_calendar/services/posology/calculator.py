@@ -122,7 +122,7 @@ def adapter_products_data_normalized(
         )
 
         first_unit_end = computed_delay + total_daily_intakes_per_unit
-        if first_unit_end in range(29, 36) and not second_unit:
+        if first_unit_end in range(29, 36):
             first_unit_end = 28
 
         second_unit_start = (

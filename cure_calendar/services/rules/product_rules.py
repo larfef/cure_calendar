@@ -41,8 +41,10 @@ def get_rules(product: NormalizedProduct) -> list[Rule]:
                     start=lambda c: max(0, c["first_unit_start"] - c["week_start"]),
                     end=lambda c: c["first_unit_end"] - c["week_start"],
                     product=None,
-                    text=lambda c: {
-                        "value": "Fin du pot 1",
+                    text=lambda c, p=product: {
+                        "value": f"{p['label']} : Terminer boite 1"
+                        if not c["week_index"] % 3
+                        else f" Arrêter {p['label']}",
                         "type": TextType.STOP_PRODUCT,
                         "enabled": True,
                     },
@@ -70,8 +72,8 @@ def get_rules(product: NormalizedProduct) -> list[Rule]:
                     ),
                     end=7,
                     product=None,
-                    text=lambda c: {
-                        "value": "Démarrer pot 2",
+                    text=lambda c, p=product: {
+                        "value": f"{p['label']} : Démarrer boite 2",
                         "type": TextType.RESTART_PRODUCT,
                         "enabled": True,
                     },
