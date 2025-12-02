@@ -1,0 +1,4 @@
+[submodule "cure_calendar"]
+	path = cure_calendar
+	url = git@github.com:Symp-be/cure_calendar.git
+	branch = main
