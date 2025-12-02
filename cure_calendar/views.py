@@ -1,5 +1,6 @@
 import base64
 import random
+import requests
 from django.shortcuts import render
 from django.db import transaction
 from django.http import HttpResponse
@@ -30,7 +31,13 @@ def generate_cart_url(products: NormalizedProduct, second_phase: bool) -> str:
             and p["second_unit_start"] >= MAX_STARTING_DAYS - 1
         ]
     else:
-        ids = [p["shopify_id"] for p in products]
+        ids = [
+            p["shopify_id"]
+            for p in products
+            if p["first_unit_start"] < MAX_STARTING_DAYS - 1
+            or p["second_unit"]
+            and p["second_unit_start"] < MAX_STARTING_DAYS - 1
+        ]
 
     raw = b"".join(id.to_bytes(8, "big") for id in ids)
     decoded = base64.urlsafe_b64encode(raw).decode("utf-8")
@@ -48,14 +55,29 @@ def calendar(request):
 
             # Check if we should load from YAML or generate random
             load_from_yaml = request.GET.get("load_snapshot", "false").lower() == "true"
+            order_id = request.GET.get("order_id")
 
             if load_from_yaml:
                 products_data = load_products_from_yaml("products_snapshot.yaml")
+            elif order_id:
+                # Fetch JSON from test_products_from_order endpoint
+                response = requests.get(
+                    f"http://localhost:8002/test-products/{order_id}/"
+                )
+                json_data = response.json()
+
+                products_data: ProductsData = {
+                    "products": {
+                        int(pid): Product.objects.get(id=int(pid))
+                        for pid in json_data["products"].keys()
+                    },
+                    "delays": {int(k): v for k, v in json_data["delays"].items()},
+                    "cortisol_phase": json_data["cortisol_phase"],
+                }
             else:
                 # sample = random.randint(1, 6)
                 sample = 10
                 sample_dict = dict(random.sample(list(MOCK_PRODUCTS.items()), sample))
-
                 products_data: ProductsData = {
                     "products": {},
                     "delays": {},
@@ -76,7 +98,7 @@ def calendar(request):
             )
 
             url = generate_cart_url(normalized_products, second_phase=True)
-
+            print(url)
             # # Compute states common to products
             calculator = PosologyCalculator(
                 normalized_products,
