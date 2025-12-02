@@ -101,6 +101,27 @@ def get_rules(product: NormalizedProduct) -> list[Rule]:
             ],
         ),
         Rule(
+            name="product_continues_during_week_12",
+            condition=lambda c, p=product: (
+                c["week_index"] == 11 and p["posology_end"] > c["week_end"]
+            ),
+            contents=[
+                ContentSpec(
+                    start=0,
+                    end=7,
+                    product=None,
+                    text=lambda p=product: (
+                        {
+                            "value": f"{p['label']} Terminer la boite",
+                            "type": TextType.FINISH_PRODUCT,
+                            "enabled": True,
+                        }
+                    ),
+                    type_css=ContentType.GREEN_LINE,
+                )
+            ],
+        ),
+        Rule(
             name="product_continues_through_week",
             condition=lambda c: c["posology_end"] > c["week_end"]
             and c["first_unit_start"] < c["week_start"],

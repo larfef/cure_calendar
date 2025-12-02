@@ -8,6 +8,7 @@ class TextType(IntEnum):
     RESTART_PRODUCT = 2
     STOP_PRODUCT = 3
     PAUSE = 4
+    FINISH_PRODUCT = 5
 
 
 class ContentType(IntEnum):

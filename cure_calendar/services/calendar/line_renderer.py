@@ -16,12 +16,14 @@ class LineRenderer:
             TextType.RESTART_PRODUCT: "line-container__restart",
             TextType.STOP_PRODUCT: "line-container__stop",
             TextType.PAUSE: "pause-container__text pause-text",
+            TextType.FINISH_PRODUCT: "cell-content__container--text-finish",
         }
 
         self.text_type_to_inline_style: dict = {
             TextType.STOP_PRODUCT: [self.get_margin_right],
             TextType.RESTART_PRODUCT: [self.prevent_text_overflow],
             TextType.PAUSE: [self.get_center_position],
+            TextType.FINISH_PRODUCT: [self.get_center_position],
         }
 
         self.content_type_to_css_style = {
