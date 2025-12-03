@@ -6,3 +6,5 @@ staticfiles
 logs
 products_snapshot.yaml
 products_snapshot.yaml
+**/.DS_Store/
+.DS_Store
