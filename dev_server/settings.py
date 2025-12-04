@@ -127,6 +127,10 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Used to determine if cure_calendar app should be launched
+# in standalone/development mode or within the complete production server
+CURE_CALENDAR_STANDALONE = True
+
 # Define from which app Product model comes from
 # This let us develop this app without depending on
 # Product definition from another app ( e.g. symp_api )
