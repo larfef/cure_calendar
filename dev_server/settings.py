@@ -126,3 +126,8 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Define from which app Product model comes from
+# This let us develop this app without depending on
+# Product definition from another app ( e.g. symp_api )
+PRODUCT_MODEL = "cure_calendar.Product"
