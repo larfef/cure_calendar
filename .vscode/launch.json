@@ -14,5 +14,20 @@
             "console": "integratedTerminal",
             "python": "${workspaceFolder}/venv/bin/python"
         },
+        {
+            "name": "Python: Attach to debugpy ( Debug management command )",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "."
+                }
+            ],
+        }
     ]
 }
